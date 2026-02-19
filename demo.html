@@ -90,7 +90,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 600px;
+            height: 650px;
             position: sticky;
             top: 20px;
         }
@@ -102,6 +102,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-shrink: 0;
         }
 
         .chat-header .avatar {
@@ -146,10 +147,12 @@
             padding: 20px;
             overflow-y: auto;
             background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .message {
-            margin-bottom: 15px;
             display: flex;
             animation: slideIn 0.3s ease;
         }
@@ -179,6 +182,7 @@
             border-radius: 18px;
             font-size: 0.95rem;
             line-height: 1.4;
+            word-wrap: break-word;
         }
 
         .message.bot .bubble {
@@ -234,7 +238,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .action-button {
@@ -254,6 +258,44 @@
             border-color: #667eea;
         }
 
+        /* Quick actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .quick-action {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            color: #333;
+        }
+
+        .quick-action:hover {
+            background: #e9ecef;
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .welcome-message .icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
         /* Chat input */
         .chat-input-area {
             padding: 15px 20px;
@@ -261,6 +303,7 @@
             border-top: 1px solid #e0e0e0;
             display: flex;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .chat-input-area input {
@@ -298,77 +341,6 @@
         .chat-input-area button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        /* Debug panel */
-        .debug-panel {
-            margin-top: 20px;
-            padding: 15px;
-            background: #1a1a2e;
-            border-radius: 10px;
-            color: #4ade80;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            display: none;
-        }
-
-        .debug-panel.show {
-            display: block;
-        }
-
-        .debug-panel h4 {
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .debug-panel .metric {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #333;
-        }
-
-        .debug-panel .metric:last-child {
-            border-bottom: none;
-        }
-
-        /* Welcome message */
-        .welcome-message {
-            text-align: center;
-            padding: 30px 20px;
-            color: #666;
-        }
-
-        .welcome-message .icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            padding: 0 20px 20px;
-        }
-
-        .quick-action {
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .quick-action:hover {
-            background: #e0e0e0;
-        }
-
-        .quick-action .icon {
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -430,19 +402,15 @@
 
             <div class="quick-actions" id="quickActions">
                 <div class="quick-action" onclick="sendQuickMessage('Hur gör jag en felanmälan?')">
-                    <span class="icon">FT</span>
                     Felanmälan
                 </div>
                 <div class="quick-action" onclick="sendQuickMessage('Vilka områden verkar ni i?')">
-                    <span class="icon">PL</span>
                     Våra områden
                 </div>
                 <div class="quick-action" onclick="sendQuickMessage('Vad kostar er förvaltning?')">
-                    <span class="icon">PR</span>
                     Priser
                 </div>
                 <div class="quick-action" onclick="sendQuickMessage('Jag vill boka ett möte')">
-                    <span class="icon">BM</span>
                     Boka möte
                 </div>
             </div>
@@ -453,36 +421,13 @@
                     id="chatInput"
                     placeholder="Skriv ditt meddelande..."
                     onkeypress="handleKeyPress(event)"
+                    autocomplete="off"
                 >
                 <button onclick="sendMessage()" id="sendButton">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                     </svg>
                 </button>
-            </div>
-
-            <div class="debug-panel" id="debugPanel">
-                <h4>Debug Info</h4>
-                <div class="metric">
-                    <span>Intent:</span>
-                    <span id="debugIntent">-</span>
-                </div>
-                <div class="metric">
-                    <span>Confidence:</span>
-                    <span id="debugConfidence">-</span>
-                </div>
-                <div class="metric">
-                    <span>Sentiment:</span>
-                    <span id="debugSentiment">-</span>
-                </div>
-                <div class="metric">
-                    <span>Lead Score:</span>
-                    <span id="debugLeadScore">-</span>
-                </div>
-                <div class="metric">
-                    <span>Action:</span>
-                    <span id="debugAction">-</span>
-                </div>
             </div>
         </div>
     </div>
@@ -492,7 +437,7 @@
         let messageHistory = [];
         let isTyping = false;
 
-        const API_URL = 'http://localhost:8000/chat'; // Change this to your backend URL
+        const API_URL = 'http://localhost:8000/chat';
 
         // Bot responses for demo (when backend is not available)
         const demoResponses = {
@@ -510,6 +455,12 @@
             // Hide welcome message
             if (welcomeMessage) {
                 welcomeMessage.style.display = 'none';
+            }
+
+            // Remove quick actions after first message
+            const quickActions = document.getElementById('quickActions');
+            if (quickActions) {
+                quickActions.style.display = 'none';
             }
 
             const messageDiv = document.createElement('div');
@@ -538,6 +489,7 @@
                 messagesContainer.appendChild(actionsDiv);
             }
 
+            // Scroll to bottom smoothly
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
@@ -559,17 +511,6 @@
         function hideTyping() {
             const typing = document.getElementById('typingIndicator');
             if (typing) typing.remove();
-        }
-
-        function updateDebug(response) {
-            const debugPanel = document.getElementById('debugPanel');
-            debugPanel.classList.add('show');
-
-            document.getElementById('debugIntent').textContent = response.intent || '-';
-            document.getElementById('debugConfidence').textContent = response.confidence ? (response.confidence * 100).toFixed(0) + '%' : '-';
-            document.getElementById('debugSentiment').textContent = response.sentiment || '-';
-            document.getElementById('debugLeadScore').textContent = response.lead_score ? response.lead_score + '/5' : '-';
-            document.getElementById('debugAction').textContent = response.action || '-';
         }
 
         async function sendMessage() {
@@ -605,7 +546,6 @@
                     const data = await response.json();
                     hideTyping();
                     addMessage(data.reply, false, data.suggested_responses);
-                    updateDebug(data);
                     messageHistory.push({ role: 'assistant', content: data.reply });
                 } else {
                     throw new Error('API not available');
@@ -615,7 +555,7 @@
                 hideTyping();
 
                 // Simulate processing delay
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 800));
 
                 let response = demoResponses.default;
                 const lowerText = text.toLowerCase();
@@ -630,16 +570,7 @@
                     response = demoResponses.boka;
                 }
 
-                addMessage(response, false, ['Ring 0793-006638', 'Mejla oss', 'Till kontaktsida']);
-
-                // Update debug with simulated data
-                updateDebug({
-                    intent: 'general_inquiry',
-                    confidence: 0.85,
-                    sentiment: 'neutral',
-                    lead_score: 2,
-                    action: 'none'
-                });
+                addMessage(response, false, ['Ring 0793-006638', 'Mejla oss']);
             }
 
             isTyping = false;
