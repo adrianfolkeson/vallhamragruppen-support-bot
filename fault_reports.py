@@ -102,30 +102,31 @@ class FaultReportSystem:
         }
 
         # Category detection patterns
+        # Note: Order matters! More specific patterns should be checked first
         self.category_patterns = {
             FaultCategory.WATER: [
-                r"\b(vatten|avlopp|diskmaskin|tvättmaskin|kran|toalett|spola|läcker|droppar)\b",
-                r"\b(water|drain|dishwasher|washing machine|faucet|toilet|leak|drip)\b"
+                r"(vatten|avlopp|diskmaskin|tvättmaskin|kran|toalett|spola|läcker|droppar)",
+                r"(water|drain|dishwasher|washing.*?machine|faucet|toilet|leak|drip)"
             ],
             FaultCategory.ELECTRICAL: [
-                r"\b(ström|el|ljus|lampa|uttag|brytare|säkring|elektrisk|glimtar)\b",
-                r"\b(power|electric|light|lamp|outlet|switch|fuse|spark)\b"
+                r"(ström|ljus|lampa|uttag|brytare|säkring|elektrisk|glimra|strömavbrott)",
+                r"(power|electric|light|lamp|outlet|switch|fuse|spark|blackout)"
             ],
             FaultCategory.HEATING: [
-                r"\b(värme|värme|element|ventilation|kyla|frys|kall|termostat)\b",
-                r"\b(heating|radiator|ventilation|cold|freeze|thermostat)\b"
+                r"(element|ventilation|termostat|radiator|kyla.*?inomhus|fryser.*?inomhus|ingen.*värme)",
+                r"(heating|radiator|thermostat|freezing.*?inside|no.*?heat)"
             ],
             FaultCategory.SECURITY: [
-                r"\b(lås|nyckel|dörr|fönster|inbrott|larm|säkerhet)\b",
-                r"\b(lock|key|door|window|break-in|alarm|security)\b"
+                r"(utelåst|låst.*ute|nyckel|lås|inbrott|skadegörelse|larm)",
+                r"(lock.*?out|locked.*?out|break.?in|burglary|vandalism|alarm)"
             ],
             FaultCategory.STRUCTURAL: [
-                r"\b(tak|vägg|golv|fönster|lucka|skada|spricka|läcker|in)\b",
-                r"\b(roof|wall|floor|ceiling|damage|crack)\b"
+                r"(tak|vägg|golv|taklucka|spricka|skada|väggbeklädnad)",
+                r"(roof|wall|floor|ceiling|crack|damage)"
             ],
             FaultCategory.APPLIANCE: [
-                r"\b(spis|ugn|kyl|frys|diskmaskin|tvättmaskin|torktumlare)\b",
-                r"\b(stove|oven|fridge|dishwasher|washer|dryer)\b"
+                r"(spis|ugn|kylskåp|frys|diskmaskin|tvättmaskin|torktumlare)",
+                r"(stove|oven|fridge|dishwasher|washing.*?machine|dryer)"
             ]
         }
 
@@ -145,14 +146,14 @@ class FaultReportSystem:
 
         # CRITICAL - Life safety or property damage
         critical_patterns = [
-            # Water disasters
-            r"\b(översvämning|vattenläcka.*(akut|stort|forsar|strömmar)|brustet.*rör|vatten.*(står|forsar))\b",
+            # Water disasters (any order)
+            r"\b(översvämning|(akut|stort|forsar|strömmar).*vattenläcka|vattenläcka.*(akut|stort|forsar|strömmar)|brustet.*rör|vatten.*(står|forsar))\b",
             r"\b(flood|burst.*pipe|water.*everywhere|emergency)\b",
             # Fire/gas
             r"\b(brinner|brand|gasläcka|gas.*luktar|eld|rök|luktar.*gas)\b",
             r"\b(fire|smell.*gas|smoke|burning)\b",
             # Lockout - person locked out is critical
-            r"\b(låst.*ute|utelåst|kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel|låset.*går.*inte)\b.*!(?:!|!)",
+            r"\b(låst.*ute|utelåst|kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel|låset.*går.*inte)\b",
             r"\b(locked.*out|locked.*out.*my.*key|cannot.*enter|can.*t.*get.*in)\b",
             # Inbrott
             r"\b(inbrott|skadegörelse|krossat|försöker.*ta.*sig)\b",

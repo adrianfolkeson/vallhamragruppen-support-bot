@@ -68,7 +68,43 @@ config = load_config("config/kund2.json")
 bot = SupportStarterBot(config)
 ```
 
-### Option 2: Cloned Deployments
+### Option 2: Multi-Tenant API (Single Server)
+
+Run ONE server that handles multiple tenants dynamically. Tenant is identified per-request:
+
+```
+config/tenants/
+├── vallhamra.json
+├── kund2.json
+└── kund3.json
+```
+
+**API Usage:**
+
+```bash
+# Start server once
+python server.py
+
+# Call with tenant via header
+curl -X POST http://localhost:8000/chat \
+  -H "X-Tenant-ID: kund2" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hej!", "session_id": "123"}'
+
+# Or via query parameter
+curl -X POST "http://localhost:8000/chat?tenant_id=kund2" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hej!", "session_id": "123"}'
+
+# Or in request body
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hej!", "session_id": "123", "tenant_id": "kund2"}'
+```
+
+**Priority order:** Request body > HTTP header > Query parameter > Environment variable > Default
+
+### Option 3: Cloned Deployments
 
 For full isolation, clone the entire codebase:
 

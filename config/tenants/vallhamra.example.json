@@ -1,0 +1,99 @@
+{
+  "_comment": "Example tenant config for Vallhamra Gruppen",
+
+  "COMPANY_NAME": "Vallhamra Gruppen AB",
+  "industry": "Fastighetsförvaltning",
+  "locations": "Partille, Lerum, Mölnlycke, Härryda",
+  "phone": "0793-006638",
+  "contact_email": "info@vallhamra.se",
+  "website": "https://vallhamra.se",
+  "business_hours": "Mån-Fre 08:00-17:00",
+  "response_time": "24 timmar",
+
+  "services": "Vi erbjuder fastighetsförvaltning, bostadsrättsadministration och teknisk förvaltning.",
+
+  "pricing": "Våra priser baseras på fastighetens storlek och omfattningen av tjänsterna. Kontakta oss för offert.",
+
+  "faq_list": "Q: Hur gör jag en felanmälan?\\nA: Ring 0793-006638 eller använd kontaktformuläret på hemsidan.\\n\\nQ: Vilka områden verkar ni i?\\nA: Vi verkar i Partille, Lerum, Mölnlycke och Härryda.",
+
+  "refund_policy": "Ej tillämpligt",
+  "cancellation_policy": "Enligt avtal",
+
+  "tone_style": "Professionell, vänlig, hjälpsam",
+  "booking_link": "https://vallhamra.se/kontakt",
+  "contact_form": "https://vallhamra.se/kontakt",
+
+  "anthropic_api_key": "",
+  "max_requests_per_minute": 60,
+
+  "fault_water_critical": "Vattenläcka! 💧 Stäng av vattnet under diskhon om möjligt. Ring jour på 0793-006638 direkt.",
+  "fault_lockout": "Utelåst? 🔑 Ring jour på 0793-006638 nu. Vilken adress?",
+  "fault_general_critical": "Akut ärende! 🚨 Ring jour på 0793-006638 direkt. Vad har hänt?",
+  "fault_water_high": "Inget vatten. 💧 Gäller det hela fastigheten eller bara din lägenhet? Ring 0793-006638.",
+  "fault_heating_high": "Ingen värme. 🌡️ Kollat termostaten? Ring 0793-006638 om det inte hjälper.",
+  "fault_electric_high": "Strömproblem. ⚡ Kolla säkringsskärmet först. Ring 0793-006638.",
+  "fault_general_high": "Viktigt ärende. Ring 0793-006638 och berätta vad som hänt.",
+  "fault_water_medium": "Vattenproblem. 💧 Läcka eller droppande kran? Var i lägenheten?",
+  "fault_appliance_medium": "Vitvaror. 🏠 Köpt av dig eller ingår i fastigheten? Ring 0793-006638.",
+  "fault_general_medium": "Beskriv problemet. Var i fastigheten? Är det akut eller kan vänta?",
+  "fault_general_low": "Vad gäller? 🤔 Felanmälan når du på 0793-006638. Berätta vad som hänt.",
+
+  "greeting_response": "Hej! 👋 Vallhamra Gruppen här. Jag hjälper med frågor om fastigheter och förvaltning.",
+  "contact_response": "Ring oss på 0793-006638 eller mejla info@vallhamra.se. Vi finns i Partille, Lerum, Mölnlycke och Härryda. 📍",
+  "hours_response": "Mån-Fre 08:00-17:00. Akuta ärenden dygnet runt: ring jour på 0793-006638. ⏰",
+  "emergency_critical_response": "Akut läge! 🚨 Ring 112 först vid fara för liv. Ring sedan jour på 0793-006638.",
+  "lockout_emergency_response": "Utelåst? 🔑 Ring jour 0793-006638 nu. Vilken adress?",
+  "how_to_report_response": "Felanmälan: ring 0793-006638 eller använd formulär på hemsidan. 🛠️",
+
+  "faq_data": [
+    {
+      "question": "Hur gör jag en felanmälan?",
+      "answer": "Ring {phone} eller använd kontaktformuläret på hemsidan. Vid akuta ärenden utanför kontorstid, ring jouren.",
+      "keywords": ["felanmälan", "fel", "reparation", "akut"]
+    },
+    {
+      "question": "Vilka områden verkar ni i?",
+      "answer": "Vi verkar i {locations}.",
+      "keywords": ["område", "var", "plats", "location"]
+    },
+    {
+      "question": "Hur snabbt får man svar?",
+      "answer": "Vi svarar inom 24 timmar på vardagar. Akuta ärenden hanteras omgående.",
+      "keywords": ["snabbt", "tid", "svar", "response"]
+    },
+    {
+      "question": "Vad ingår i hyran?",
+      "answer": "Hyran inkluderar värme, vatten och bredband (10 Mbit/s). Kabel-TV ingår om inget annat anges.",
+      "keywords": ["hyra", "ingår", "pris", "kostnad"]
+    },
+    {
+      "question": "Har ni några lägenheter lediga?",
+      "answer": "Våra lediga lägenheter publiceras på vår hemsida under 'Ledigt'. Kontakta oss på {phone} för mer information.",
+      "keywords": ["ledig", "lägenhet", "hyra", "bostad"]
+    }
+  ],
+
+  "knowledge_chunks": [
+    {
+      "id": "company_info",
+      "content": "COMPANY: {COMPANY_NAME}. Phone: {phone}. Email: {email}. Website: {website}. Hours: {business_hours}. Locations: {locations}.",
+      "category": "contact",
+      "keywords": ["kontakt", "ring", "mejl", "telefon"],
+      "priority": 3
+    },
+    {
+      "id": "services",
+      "content": "{COMPANY_NAME} erbjuder fastighetsförvaltning, bostadsrättsadministration och teknisk förvaltning. Vi hanterar felanmälningar, underhåll och renovationer.",
+      "category": "services",
+      "keywords": ["tjänster", "förvaltning", "tjänst"],
+      "priority": 2
+    },
+    {
+      "id": "rent_includes",
+      "content": "Hyran inkluderar värme, vatten och bredband (10 Mbit/s). Kabel-TV ingår om inget annat anges i kontraktet.",
+      "category": "pricing",
+      "keywords": ["hyra", "ingår", "värme", "vatten", "bredband"],
+      "priority": 2
+    }
+  ]
+}

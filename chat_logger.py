@@ -48,11 +48,15 @@ class ConversationLog:
 
     def add_message(self, role: str, content: str, **metadata):
         """Add a message to the conversation"""
+        # Filter metadata to only include ChatMessage fields
+        allowed_fields = {"intent", "urgency", "lead_score"}
+        filtered_metadata = {k: v for k, v in metadata.items() if k in allowed_fields}
+
         msg = ChatMessage(
             role=role,
             content=content,
             timestamp=datetime.now().isoformat(),
-            **metadata
+            **filtered_metadata
         )
         self.messages.append(msg)
 

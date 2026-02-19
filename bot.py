@@ -24,6 +24,7 @@ from fault_reports import FaultReportSystem, get_fault_system
 from local_model import LocalModel
 from chat_logger import LogManager, get_log_manager
 from config_loader import load_config_or_default, BotConfig as ConfigBotConfig
+from sheets_admin import HybridConfigLoader
 
 
 @dataclass
@@ -31,15 +32,51 @@ class BotConfig:
     """
     Configuration wrapper - loads from JSON config file.
     Falls back to defaults if no config file is found.
-    Use BotConfig() to load default config from config/config.json
-    Use BotConfig(config_file="path/to/config.json") for specific config
+
+    Multi-tenant options:
+    - BotConfig()                      # Uses config/config.json or TENANT_ID env var
+    - BotConfig(config_file="...")    # Specific config file
+    - BotConfig(tenant_id="kund2")    # Loads config/tenants/kund2.json
+
+    Google Sheets integration:
+    - Set GOOGLE_SHEET_ID env var to load FAQ from Sheets
+    - Set GOOGLE_CREDENTIALS_PATH to point to credentials JSON
     """
     # Delegate to loaded config from file
     _config: ConfigBotConfig = None
+    tenant_id: str = None  # Track which tenant this config is for
+    _sheets_data: Dict[str, Any] = None  # Cached data from Sheets
 
-    def __init__(self, config_file: Optional[str] = None):
+    def __init__(self, config_file: Optional[str] = None, tenant_id: Optional[str] = None,
+                 use_sheets: bool = True):
         """Load config from JSON file"""
+        # Determine config file path
+        if config_file is None:
+            tenant_id = tenant_id or os.getenv("TENANT_ID")
+            if tenant_id:
+                # Multi-tenant: look in config/tenants/{tenant_id}.json
+                config_file = f"config/tenants/{tenant_id}.json"
+            else:
+                # Single-tenant: use config/config.json
+                config_file = "config/config.json"
+
         self._config = load_config_or_default(config_file)
+        self.tenant_id = tenant_id
+
+        # Load FAQ/knowledge from Google Sheets if enabled
+        if use_sheets and os.getenv("GOOGLE_SHEET_ID"):
+            try:
+                hybrid_loader = HybridConfigLoader(tenant_id=tenant_id, use_sheets=True)
+                config_dict = hybrid_loader.load_config()
+                self._sheets_data = {
+                    "faq_data": config_dict.get("faq_data", []),
+                    "knowledge_chunks": config_dict.get("knowledge_chunks", [])
+                }
+            except Exception as e:
+                print(f"Warning: Could not load from Google Sheets: {e}")
+                self._sheets_data = None
+        else:
+            self._sheets_data = None
 
     @property
     def COMPANY_NAME(self) -> str: return self._config.COMPANY_NAME
@@ -116,11 +153,20 @@ class BotConfig:
     @property
     def how_to_report_response(self) -> str: return self._config.how_to_report_response
 
-    # FAQ data from config
+    # FAQ data from config or Sheets
     @property
-    def faq_data(self) -> list: return getattr(self._config, 'faq_data', [])
+    def faq_data(self) -> list:
+        """Get FAQ data -优先级: Sheets > Config file"""
+        if self._sheets_data and self._sheets_data.get("faq_data"):
+            return self._sheets_data["faq_data"]
+        return getattr(self._config, 'faq_data', [])
+
     @property
-    def knowledge_chunks(self) -> list: return getattr(self._config, 'knowledge_chunks', [])
+    def knowledge_chunks(self) -> list:
+        """Get knowledge chunks - 优先级: Sheets > Config file"""
+        if self._sheets_data and self._sheets_data.get("knowledge_chunks"):
+            return self._sheets_data["knowledge_chunks"]
+        return getattr(self._config, 'knowledge_chunks', [])
 
 
 class SupportStarterBot:
@@ -583,21 +629,25 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
 
 # Convenience function for quick usage
 def create_bot(anthropic_api_key: Optional[str] = None,
-               company_name: str = "Vallhamragruppen AB") -> SupportStarterBot:
+               company_name: str = "Vallhamragruppen AB",
+               tenant_id: Optional[str] = None) -> SupportStarterBot:
     """
     Quick function to create a bot
 
     Args:
-        anthropic_api_key: Optional Anthropic API key
-        company_name: Name of the company
+        anthropic_api_key: Optional Anthropic API key (overrides env/config)
+        company_name: Name of the company (only used if no config file found)
+        tenant_id: Tenant ID for multi-tenant deployment
 
     Returns:
         Configured SupportStarterBot instance
     """
-    config = BotConfig(
-        COMPANY_NAME=company_name,
-        anthropic_api_key=anthropic_api_key or os.getenv("ANTHROPIC_API_KEY", "")
-    )
+    config = BotConfig(tenant_id=tenant_id)
+
+    # Override API key if provided
+    if anthropic_api_key:
+        config._config.anthropic_api_key = anthropic_api_key
+
     return SupportStarterBot(config)
 
 

@@ -9,6 +9,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 from enum import Enum
 import json
+import os
 
 
 class EscalationPriority(Enum):
@@ -100,12 +101,26 @@ class EscalationContext:
 class EscalationEngine:
     """
     Engine for determining when and how to escalate
+
+    Escalation rules can be configured via:
+    1. Config file (escalation_rules section)
+    2. Environment variables
+    3. Default built-in rules
     """
-    def __init__(self):
+    def __init__(self, config=None):
+        self.config = config
         self.escalation_rules = self._load_rules()
+        self.escalation_triggers = self._load_triggers()
 
     def _load_rules(self) -> Dict[EscalationReason, Dict[str, Any]]:
-        """Load escalation rules"""
+        """Load escalation rules from config or use defaults"""
+        # Check if config has escalation rules
+        if self.config and hasattr(self.config, '_config'):
+            config_rules = getattr(self.config._config, 'escalation_rules', None)
+            if config_rules:
+                return self._parse_config_rules(config_rules)
+
+        # Default rules
         return {
             EscalationReason.LEGAL_THREAT: {
                 "priority": EscalationPriority.CRITICAL,
@@ -157,24 +172,72 @@ class EscalationEngine:
             }
         }
 
+    def _load_triggers(self) -> Dict[str, Any]:
+        """Load escalation triggers from config or use defaults"""
+        # Check environment variables first
+        triggers = {
+            "max_conversation_turns": int(os.getenv("ESCALATION_MAX_TURNS", "8")),
+            "min_lead_score_for_escalation": int(os.getenv("ESCALATION_MIN_LEAD_SCORE", "4")),
+            "sentiment_escalation": os.getenv("ESCALATION_SENTIMENT", "angry,frustrated").split(","),
+            "keyword_triggers": {
+                "legal": os.getenv("ESCALATION_LEGAL_KEYWORDS", "lagar,advokat,konsumentverket,polisen,stämma").split(","),
+                "manager": os.getenv("ESCALATION_MANAGER_KEYWORDS", "chef,manager,ledning,överordnad").split(","),
+                "billing": os.getenv("ESCALATION_BILLING_KEYWORDS", "faktureringsfel,felaktig betalning,dragen pengar").split(","),
+                "contract": os.getenv("ESCALATION_CONTRACT_KEYWORDS", "avtal,kontrakt,bindande").split(","),
+            }
+        }
+
+        # Check if config has escalation triggers
+        if self.config and hasattr(self.config, '_config'):
+            config_triggers = getattr(self.config._config, 'escalation_triggers', None)
+            if config_triggers:
+                triggers.update(config_triggers)
+
+        return triggers
+
+    def _parse_config_rules(self, config_rules: Dict) -> Dict[EscalationReason, Dict[str, Any]]:
+        """Parse escalation rules from config"""
+        rules = {}
+        for reason_name, rule_config in config_rules.items():
+            try:
+                reason = EscalationReason(reason_name)
+                priority = EscalationPriority(rule_config.get("priority", "medium"))
+                rules[reason] = {
+                    "priority": priority,
+                    "auto_escalate": rule_config.get("auto_escalate", True),
+                    "notify": rule_config.get("notify", ["support"]),
+                    "response_template": rule_config.get("response_template", "Jag kopplar dig till rätt person.")
+                }
+            except ValueError:
+                # Invalid reason name, skip
+                continue
+        return rules
+
     def should_escalate(self, intent: str, sentiment: str, lead_score: int,
                        conversation_turns: int, message: str) -> tuple[bool, Optional[EscalationReason]]:
         """
         Determine if conversation should be escalated
 
+        Uses configurable triggers from:
+        - Config file (escalation_triggers section)
+        - Environment variables
+        - Default values
+
         Returns:
             Tuple of (should_escalate, reason)
         """
-        # Legal threat
-        if any(word in message.lower() for word in ["lagar", "advokat", "konsumentverket", "polisen", "stämma"]):
+        triggers = self.escalation_triggers
+
+        # Legal threat (configurable keywords)
+        if any(word in message.lower() for word in triggers["keyword_triggers"].get("legal", [])):
             return True, EscalationReason.LEGAL_THREAT
 
-        # Angry customer
-        if sentiment == "angry":
+        # Angry customer (configurable sentiments)
+        if sentiment in triggers.get("sentiment_escalation", ["angry"]):
             return True, EscalationReason.ANGRY_CUSTOMER
 
-        # Manager request
-        if any(word in message.lower() for word in ["chef", "manager", "ledning", "överordnad"]):
+        # Manager request (configurable keywords)
+        if any(word in message.lower() for word in triggers["keyword_triggers"].get("manager", [])):
             return True, EscalationReason.MANAGER_REQUEST
 
         # Technical issue after multiple attempts
@@ -185,17 +248,24 @@ class EscalationEngine:
         if intent == "refund_request" and sentiment in ["frustrated", "angry"]:
             return True, EscalationReason.REFUND_DISPUTE
 
-        # Complex case (many turns without resolution)
-        if conversation_turns > 8:
+        # Complex case (configurable max turns)
+        max_turns = triggers.get("max_conversation_turns", 8)
+        if conversation_turns > max_turns:
             return True, EscalationReason.COMPLEX_CASE
 
-        # Billing issue
-        if any(word in message.lower() for word in ["faktureringsfel", "felaktig betalning", "dragen pengar"]):
+        # Billing issue (configurable keywords)
+        if any(word in message.lower() for word in triggers["keyword_triggers"].get("billing", [])):
             return True, EscalationReason.BILLING_ERROR
 
-        # Contractual
-        if any(word in message.lower() for word in ["avtal", "kontrakt", "bindande"]):
+        # Contractual (configurable keywords)
+        if any(word in message.lower() for word in triggers["keyword_triggers"].get("contract", [])):
             return True, EscalationReason.CONTRACTUAL
+
+        # High lead score escalation (configurable threshold)
+        min_lead = triggers.get("min_lead_score_for_escalation", 5)
+        if lead_score >= min_lead:
+            # Don't auto-escalate just for lead score, but mark for human review
+            return False, None
 
         return False, None
 

@@ -73,12 +73,20 @@ class BotConfig:
     faq_data: list = None
     knowledge_chunks: list = None
 
+    # Escalation configuration
+    escalation_rules: dict = None
+    escalation_triggers: dict = None
+
     def __post_init__(self):
         """Handle default mutable values"""
         if self.faq_data is None:
             self.faq_data = []
         if self.knowledge_chunks is None:
             self.knowledge_chunks = []
+        if self.escalation_rules is None:
+            self.escalation_rules = {}
+        if self.escalation_triggers is None:
+            self.escalation_triggers = {}
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'BotConfig':

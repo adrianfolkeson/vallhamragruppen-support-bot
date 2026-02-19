@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 import uvicorn
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Header
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -28,6 +28,7 @@ class ChatRequest(BaseModel):
     message: str
     session_id: str
     conversation_history: Optional[List[Dict[str, str]]] = None
+    tenant_id: Optional[str] = None  # Tenant override in request body
 
 
 class ChatResponse(BaseModel):
@@ -63,22 +64,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global bot instance
-bot_instance: Optional[SupportStarterBot] = None
+# Global bot instances (per-tenant for multi-tenant support)
+bot_instances: Dict[str, SupportStarterBot] = {}
 webhook_manager: Optional[WebhookManager] = None
 
 
-def get_bot() -> SupportStarterBot:
-    """Get or create bot instance"""
-    global bot_instance
-    if bot_instance is None:
-        # Create bot with config from environment
-        config = BotConfig(
-            anthropic_api_key=os.getenv("ANTHROPIC_API_KEY", ""),
-            COMPANY_NAME=os.getenv("COMPANY_NAME", "Vallhamragruppen AB")
-        )
-        bot_instance = SupportStarterBot(config)
-    return bot_instance
+def get_bot(tenant_id: Optional[str] = None) -> SupportStarterBot:
+    """
+    Get or create bot instance for a specific tenant.
+
+    Multi-tenant options:
+    - via HTTP header: X-Tenant-ID
+    - via query parameter: ?tenant_id=kund2
+    - via environment: TENANT_ID env var (default)
+
+    Args:
+        tenant_id: Tenant identifier (e.g., "vallhamra", "kund2")
+
+    Returns:
+        SupportStarterBot instance for the tenant
+    """
+    # Resolve tenant_id from parameter, env, or default
+    tenant_id = tenant_id or os.getenv("TENANT_ID", "default")
+
+    # Return cached instance if exists
+    if tenant_id in bot_instances:
+        return bot_instances[tenant_id]
+
+    # Create new bot instance for this tenant
+    config = BotConfig(tenant_id=tenant_id if tenant_id != "default" else None)
+
+    # Override API key from env if set (security best practice)
+    if os.getenv("ANTHROPIC_API_KEY"):
+        config._config.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+
+    bot_instances[tenant_id] = SupportStarterBot(config)
+    print(f"Created bot instance for tenant: {tenant_id} ({config.COMPANY_NAME})")
+    return bot_instances[tenant_id]
 
 
 def get_webhooks() -> WebhookManager:
@@ -116,9 +138,14 @@ async def health():
 
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest, background_tasks: BackgroundTasks):
+async def chat(
+    request: ChatRequest,
+    background_tasks: BackgroundTasks,
+    x_tenant_id: Optional[str] = Header(None, alias="X-Tenant-ID"),
+    tenant_id: Optional[str] = Query(None, description="Tenant ID override")
+):
     """
-    Main chat endpoint
+    Main chat endpoint with multi-tenant support
 
     Processes a user message and returns a structured response with:
     - AI-generated reply
@@ -127,9 +154,24 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks):
     - Lead score
     - Escalation flag
     - Suggested actions
+
+    Multi-tenant identification (in order of priority):
+    1. Request body: {"tenant_id": "kund2"}
+    2. HTTP header: X-Tenant-ID: kund2
+    3. Query parameter: ?tenant_id=kund2
+    4. Environment variable: TENANT_ID
+    5. Default: config/config.json
     """
     try:
-        bot = get_bot()
+        # Resolve tenant_id from multiple sources (priority order)
+        tenant_id = (
+            request.tenant_id or           # 1. Request body
+            x_tenant_id or                 # 2. HTTP header
+            tenant_id or                   # 3. Query parameter
+            "default"                      # 4. Use env/default
+        )
+
+        bot = get_bot(tenant_id)
         webhooks = get_webhooks()
 
         # Process the message
@@ -190,19 +232,76 @@ async def test_webhook(background_tasks: BackgroundTasks):
 
 
 @app.get("/metrics")
-async def metrics():
-    """Get metrics report"""
-    bot = get_bot()
-    return bot.get_metrics_report()
+async def metrics(
+    x_tenant_id: Optional[str] = Header(None, alias="X-Tenant-ID"),
+    tenant_id: Optional[str] = Query(None, description="Tenant ID")
+):
+    """Get metrics report for a specific tenant"""
+    resolved_tenant = x_tenant_id or tenant_id or "default"
+    bot = get_bot(resolved_tenant)
+    return {
+        "tenant": resolved_tenant,
+        "company": bot.config.COMPANY_NAME,
+        **bot.get_metrics_report()
+    }
 
 
 @app.post("/reset")
-async def reset_session(session_id: str):
-    """Reset a conversation session"""
-    bot = get_bot()
+async def reset_session(
+    session_id: str,
+    x_tenant_id: Optional[str] = Header(None, alias="X-Tenant-ID"),
+    tenant_id: Optional[str] = Query(None, description="Tenant ID")
+):
+    """Reset a conversation session for a specific tenant"""
+    resolved_tenant = x_tenant_id or tenant_id or "default"
+    bot = get_bot(resolved_tenant)
     if session_id in bot.memory.sessions:
         del bot.memory.sessions[session_id]
-    return {"status": "Session reset"}
+    return {"status": "Session reset", "tenant": resolved_tenant}
+
+
+# GDPR Endpoints
+@app.get("/gdpr/status")
+async def gdpr_status():
+    """Get GDPR compliance status"""
+    from gdpr import get_gdpr_manager
+    gdpr_manager = get_gdpr_manager()
+    return gdpr_manager.get_gdpr_status()
+
+
+@app.get("/gdpr/export/{identifier}")
+async def gdpr_export(identifier: str, identifier_type: str = "email"):
+    """
+    Export user data (GDPR right to data portability)
+
+    Args:
+        identifier: User's email, phone, or session_id
+        identifier_type: Type of identifier (email, phone, session_id)
+    """
+    from gdpr import get_gdpr_manager
+    gdpr_manager = get_gdpr_manager()
+
+    data = gdpr_manager.export_user_data(identifier, identifier_type)
+    if not data:
+        raise HTTPException(status_code=404, detail="No data found for this identifier")
+
+    return data
+
+
+@app.delete("/gdpr/delete/{identifier}")
+async def gdpr_delete(identifier: str, identifier_type: str = "email"):
+    """
+    Delete user data (GDPR right to be forgotten)
+
+    Args:
+        identifier: User's email, phone, or session_id
+        identifier_type: Type of identifier (email, phone, session_id)
+    """
+    from gdpr import get_gdpr_manager
+    gdpr_manager = get_gdpr_manager()
+
+    report = gdpr_manager.delete_user_data(identifier, identifier_type)
+    return report
 
 
 # Background task handlers

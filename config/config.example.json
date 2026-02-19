@@ -75,5 +75,38 @@
       "keywords": ["kontakt", "ring", "mejl", "telefon"],
       "priority": 3
     }
-  ]
+  ],
+
+  "_comment_escalation": "Escalation rules and triggers",
+  "escalation_rules": {
+    "legal_threat": {
+      "priority": "critical",
+      "auto_escalate": true,
+      "notify": ["legal", "management"],
+      "response_template": "Jag kopplar dig direkt till vår jurist."
+    },
+    "angry_customer": {
+      "priority": "high",
+      "auto_escalate": true,
+      "notify": ["support_lead"],
+      "response_template": "Jag förstår att du är frustrerad. Låt mig koppla dig till en chef."
+    },
+    "technical_issue": {
+      "priority": "medium",
+      "auto_escalate": false,
+      "notify": ["technical"],
+      "response_template": "Detta verkar vara ett tekniskt problem. Jag eskalerar detta till vårt tekniska team."
+    }
+  },
+  "escalation_triggers": {
+    "max_conversation_turns": 8,
+    "min_lead_score_for_escalation": 4,
+    "sentiment_escalation": ["angry", "frustrated"],
+    "keyword_triggers": {
+      "legal": ["lagar", "advokat", "konsumentverket", "polisen", "stämma"],
+      "manager": ["chef", "manager", "ledning", "överordnad"],
+      "billing": ["faktureringsfel", "felaktig betalning", "dragen pengar"],
+      "contract": ["avtal", "kontrakt", "bindande"]
+    }
+  }
 }

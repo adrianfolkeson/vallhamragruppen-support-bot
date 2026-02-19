@@ -1,0 +1,4 @@
+Session ID,Started At,Ended At,Message Count,Escalated,Status,Customer Name,Customer Email,Final Intent,Final Sentiment,Final Lead Score
+test_session_3,2026-02-20T00:22:15.939970,2026-02-20T00:22:15.940044,2,True,escalated,,,,,
+test_session_4,2026-02-20T00:22:15.937920,2026-02-20T00:22:15.938008,2,True,escalated,,,,,
+test_session,2026-02-20T00:22:22.366248,2026-02-20T00:22:22.366476,2,True,escalated,,,,,

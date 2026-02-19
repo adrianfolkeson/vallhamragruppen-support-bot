@@ -9,6 +9,8 @@ google-credentials.json
 config/config.json
 config/*.json
 !config/config.example.json
+config/tenants/*.json
+!config/tenants/*.example.json
 
 # Chat logs (customer data)
 chat_logs/

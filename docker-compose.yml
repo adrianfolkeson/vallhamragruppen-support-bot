@@ -1,0 +1,74 @@
+# SUPPORT STARTER AI - DOCKER COMPOSE
+# =====================================
+# Multi-tenant deployment with Docker Compose
+
+version: '3.8'
+
+services:
+  support-starter:
+    build: .
+    container_name: support-starter-bot
+    ports:
+      - "8000:8000"
+    environment:
+      # Anthropic API (required for AI responses)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # Multi-tenant configuration
+      - TENANT_ID=${TENANT_ID:-default}
+
+      # Google Sheets (optional - for FAQ admin)
+      - GOOGLE_SHEET_ID=${GOOGLE_SHEET_ID:-}
+      - GOOGLE_CREDENTIALS_PATH=/app/config/google-credentials.json
+
+      # Admin notifications (optional)
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+
+      # Server configuration
+      - PORT=8000
+      - LOG_LEVEL=info
+    volumes:
+      # Persist chat logs
+      - ./chat_logs:/app/chat_logs
+      # Mount tenant configs
+      - ./config/tenants:/app/config/tenants:ro
+      # Mount optional Google credentials
+      - ./google-credentials.json:/app/config/google-credentials.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - support-starter-network
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: support-starter-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - support-starter
+    restart: unless-stopped
+    networks:
+      - support-starter-network
+    profiles:
+      - with-nginx
+
+networks:
+  support-starter-network:
+    driver: bridge
+
+volumes:
+  chat_logs:
