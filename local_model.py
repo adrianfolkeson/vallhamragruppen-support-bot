@@ -435,6 +435,12 @@ class LocalModel:
                 "intent": "pricing_question",
                 "lead_score": 4
             },
+            # Available apartments/properties
+            r"\b(ledig|lediga|ledigt|tom|tomma|lägenhet|lägenheter|bostad|bostäder|fastighet|hyresrätt|brf|lokaler|lokal)\b": {
+                "response": "Lediga lägenheter/lokaler? Kontakta oss på 0793-006638 eller info@vallhamragruppen.se så berättar vi vad du söker.",
+                "intent": "availability",
+                "lead_score": 4
+            },
 
             # ============================================
             # NEGATIVE SENTIMENT & ESCALATION
