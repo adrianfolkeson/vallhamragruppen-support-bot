@@ -113,6 +113,8 @@
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
         }
 
         .chat-header .info h3 {
@@ -338,7 +340,7 @@
         }
 
         .welcome-message .icon {
-            font-size: 3rem;
+            font-size: 2rem;
             margin-bottom: 15px;
         }
 
@@ -363,8 +365,8 @@
             background: #e0e0e0;
         }
 
-        .quick-action .emoji {
-            font-size: 1.5rem;
+        .quick-action .icon {
+            font-size: 1.2rem;
             display: block;
             margin-bottom: 5px;
         }
@@ -374,24 +376,24 @@
     <div class="container">
         <!-- Landing Page Content -->
         <div class="landing-page">
-            <h1>🏢 Vallhamragruppen AB</h1>
+            <h1>Vallhamragruppen AB</h1>
             <p class="subtitle">AI-driven kundsupport för fastighetsförvaltning</p>
 
             <div class="features">
                 <div class="feature">
-                    <h3>⚡ Snabba svar</h3>
+                    <h3>Snabba svar</h3>
                     <p>Omedelbara svar på vanliga frågor dygnet runt.</p>
                 </div>
                 <div class="feature">
-                    <h3>🎯 Smart förvaltning</h3>
+                    <h3>Smart förvaltning</h3>
                     <p>Automatiserad felanmälan och ärendehantering.</p>
                 </div>
                 <div class="feature">
-                    <h3>📊 Lead-scoring</h3>
+                    <h3>Lead-scoring</h3>
                     <p>Identifiera och prioritera seriösa förfrågningar.</p>
                 </div>
                 <div class="feature">
-                    <h3>🔄 Eskalering</h3>
+                    <h3>Eskalering</h3>
                     <p>Skicka komplexa ärenden automatiskt till rätt person.</p>
                 </div>
             </div>
@@ -411,7 +413,7 @@
         <!-- Chat Widget -->
         <div class="chat-widget">
             <div class="chat-header">
-                <div class="avatar">🏢</div>
+                <div class="avatar">VG</div>
                 <div class="info">
                     <h3>Vallhamragruppen</h3>
                     <p>Digital assistent</p>
@@ -421,26 +423,26 @@
 
             <div class="chat-messages" id="chatMessages">
                 <div class="welcome-message" id="welcomeMessage">
-                    <div class="icon">👋</div>
+                    <div class="icon">Hej</div>
                     <p>Välkommen! Jag hjälper dig med frågor om våra fastigheter och tjänster.</p>
                 </div>
             </div>
 
             <div class="quick-actions" id="quickActions">
                 <div class="quick-action" onclick="sendQuickMessage('Hur gör jag en felanmälan?')">
-                    <span class="emoji">🔧</span>
+                    <span class="icon">FT</span>
                     Felanmälan
                 </div>
                 <div class="quick-action" onclick="sendQuickMessage('Vilka områden verkar ni i?')">
-                    <span class="emoji">📍</span>
+                    <span class="icon">PL</span>
                     Våra områden
                 </div>
                 <div class="quick-action" onclick="sendQuickMessage('Vad kostar er förvaltning?')">
-                    <span class="emoji">💰</span>
+                    <span class="icon">PR</span>
                     Priser
                 </div>
                 <div class="quick-action" onclick="sendQuickMessage('Jag vill boka ett möte')">
-                    <span class="emoji">📅</span>
+                    <span class="icon">BM</span>
                     Boka möte
                 </div>
             </div>
@@ -460,7 +462,7 @@
             </div>
 
             <div class="debug-panel" id="debugPanel">
-                <h4>🔍 Debug Info</h4>
+                <h4>Debug Info</h4>
                 <div class="metric">
                     <span>Intent:</span>
                     <span id="debugIntent">-</span>
