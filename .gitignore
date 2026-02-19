@@ -2,6 +2,12 @@
 .env
 .env.local
 
+# Google credentials (sensitive!)
+google-credentials.json
+
+# Chat logs (customer data)
+chat_logs/
+
 # Python
 __pycache__/
 *.py[cod]

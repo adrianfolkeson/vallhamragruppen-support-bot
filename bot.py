@@ -22,6 +22,7 @@ from escalation import EscalationEngine, EscalationReason
 from metrics import MetricsEngine
 from fault_reports import FaultReportSystem, get_fault_system
 from local_model import LocalModel
+from chat_logger import LogManager, get_log_manager
 
 
 @dataclass
@@ -99,6 +100,7 @@ class SupportStarterBot:
         self.metrics = MetricsEngine()
         self.fault_system = FaultReportSystem()
         self.local_model = LocalModel(company_name=self.config.COMPANY_NAME)
+        self.log_manager = get_log_manager()  # Chat logging & notifications
 
         # Initialize RAG with knowledge base
         self.rag = self._create_knowledge_base()
@@ -690,8 +692,10 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
         # 1. Security check
         allowed, sanitized_message, security_error = self.security.process_input(message, session_id)
         if not allowed:
+            reply = "Meddelandet kunde inte bearbetas. Vänligen kontakta oss via telefon om problemet kvarstår."
+            self._log_bot_response(session_id, reply, "security_block", False)
             return create_response(
-                reply="Meddelandet kunde inte bearbetas. Vänligen kontakta oss via telefon om problemet kvarstår.",
+                reply=reply,
                 intent="security_block",
                 confidence=1.0,
                 sentiment="neutral",
@@ -705,6 +709,19 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
         # 2. Get or create session
         session = self.memory.get_or_create_session(session_id)
         self.metrics.track_conversation_start(session_id)
+
+        # Start or update chat log
+        conv = self.log_manager.logger.get_conversation(session_id)
+        if conv is None:
+            customer_info = {
+                "name": session.memory.get("customer_name", {}).get("value"),
+                "email": session.memory.get("customer_email", {}).get("value"),
+                "phone": session.memory.get("customer_phone", {}).get("value")
+            }
+            self.log_manager.start_conversation(session_id, customer_info)
+
+        # Log user message
+        self.log_manager.log_message(session_id, "user", message)
 
         # 3. Check for FAULT REPORTS first (all urgent issues like water leaks, lockouts, etc.)
         fault_result = self.fault_system.collect_fault_report(
@@ -751,8 +768,11 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             else:
                 follow_up = ""
 
+            reply = fault_result["response"] + follow_up
+            self._log_bot_response(session_id, reply, "fault_report", is_urgent,
+                                  urgency=report.urgency.value)
             return create_response(
-                reply=fault_result["response"] + follow_up,
+                reply=reply,
                 intent="fault_report",
                 confidence=0.95,
                 sentiment="neutral" if report.urgency != report.urgency.CRITICAL else "frustrated",
@@ -764,6 +784,8 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
         # 4. Check if local model can handle this (faster, no API cost)
         if self.local_model.can_handle(message):
             local_result = self.local_model.generate(message)
+            self._log_bot_response(session_id, local_result["response"],
+                                  local_result["intent"], local_result["escalate"])
             return create_response(
                 reply=local_result["response"],
                 intent=local_result["intent"],
@@ -821,6 +843,8 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
 
             self.metrics.track_escalation(session_id, escalation_reason.value)
 
+            self._log_bot_response(session_id, escalation_response,
+                                  router_result.intent.value, True)
             return create_response(
                 reply=escalation_response,
                 intent=router_result.intent.value,
@@ -862,7 +886,8 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             router_result.intent.value
         )
 
-        # 14. Create response
+        # 14. Log bot response and create response
+        self._log_bot_response(session_id, reply, router_result.intent.value, False)
         return create_response(
             reply=reply,
             intent=router_result.intent.value,
@@ -873,6 +898,20 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             action="book_call" if router_result.lead_score >= 4 else "none",
             suggested_responses=suggested_actions[:3]
         )
+
+    def _log_bot_response(self, session_id: str, reply: str, intent: str,
+                          escalate: bool, urgency: str = None):
+        """Log bot response to chat logger"""
+        metadata = {"intent": intent}
+        if escalate:
+            metadata["escalated"] = True
+        if urgency:
+            metadata["urgency"] = urgency
+        self.log_manager.log_message(session_id, "assistant", reply, **metadata)
+
+        # Auto-end conversation if escalated (send notifications)
+        if escalate and intent != "fault_report":  # fault reports handled separately
+            self.log_manager.end_conversation(session_id, status="escalated")
 
     def _generate_response(self, message: str, prompt: str,
                           router_result, session) -> str:
