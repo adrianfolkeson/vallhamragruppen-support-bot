@@ -102,7 +102,7 @@ class LocalModel:
                 "lead_score": 2
             },
             r"\b(hej|tjena|hallå|god dag|hello|hi|hey)\b": {
-                "response": f"Hej! Välkommen till {company_name}. Hur kan jag hjälpa dig idag?",
+                "response": "Hej! Välkommen till Vallhamragruppen. Hur kan jag hjälpa dig idag?",
                 "intent": "greeting",
                 "lead_score": 1
             },
