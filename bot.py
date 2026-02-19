@@ -116,11 +116,12 @@ class SupportStarterBot:
                 print("Warning: anthropic package not installed. Run: pip install anthropic")
 
     def _create_knowledge_base(self) -> SimpleRAG:
-        """Create knowledge base with company info"""
+        """Create knowledge base with company info and property management knowledge"""
         rag = SimpleRAG()
 
-        # Add company-specific FAQ
+        # Add comprehensive FAQ
         faq_data = [
+            # Basic contact & info
             {
                 "question": "Hur gör jag en felanmälan?",
                 "answer": "Felanmälan görs enklast via vår hemsida under 'Kontakta oss' eller genom att ringa oss på 0793-006638. För akuta ärenden utanför kontorstid, ring vår jour.",
@@ -145,7 +146,153 @@ class SupportStarterBot:
                 "question": "Vad kostar er förvaltning?",
                 "answer": "Prissättning sker individuellt baserat på fastighetens storlek och omfattning av tjänster. Kontakta oss för en kostnadsfri offert.",
                 "keywords": ["pris", "kostnad", "betala", "offert"]
-            }
+            },
+
+            # Property Management - Technical
+            {
+                "question": "Vad ingår i fastighetsförvaltning?",
+                "answer": "Fastighetsförvaltning inkluderar: drift och underhåll, ekonomisk förvaltning, hyresadministration, styrelsesupport för BRF:er, projektledning vid renoveringar, och jour dygnet runt för akuta ärenden.",
+                "keywords": ["tjänster", "förvaltning", "ingår", "omfatt"]
+            },
+            {
+                "question": "Vem ansvarar för vitvaror i lägenheten?",
+                "answer": "Vitvaror som ägaren själv köpt (t.ex. diskmaskin, tvättmaskin) är hyresgästens/ägarens ansvar. Fastighetsägaren ansvarar för inkopplade vitvaror som ingår i lägenheten (ofta kyl/frys i vissa nybyggnationer). Vid osäkerhet, kontakta oss.",
+                "keywords": ["vitvaror", "ansvar", "diskmaskin", "tvättmaskin", "kyl", "frys"]
+            },
+            {
+                "question": "Vem byter glödlampor och lampor?",
+                "answer": "Hyresgäst/ägare byter självvanliga glödlampor och LED-lampor. Sitter armaturen fast i tak/vägg och går ej att lossa är det fastighetsägarens ansvar.",
+                "keywords": ["lampa", "glödlampa", "belysning", "byt", "ansvar"]
+            },
+            {
+                "question": "Vad gör jag om det droppar vatten?",
+                "answer": "Droppar det från en kran eller armatur, försök täta med handduk. Är det en vattenläcka från rör, stäng av ventilen under diskhon och ring jour på 0793-006638. Oavsätt - kontrollera om vatten når eluttag.",
+                "keywords": ["vatten", "dropp", "läcka", "kran", "akut"]
+            },
+            {
+                "question": "Vem ansvarar för fönsterputs?",
+                "answer": "Hyresgäst/ägare putsar själva invändigt. Utvändig putsning och fönster på höga våningar sköts av fastighetsägaren med jämna mellanrum.",
+                "keywords": ["fönster", "puts", "städ", "rent"]
+            },
+
+            # Property Management - Tenant/Landlord
+            {
+                "question": "Får jag hyra ut min lägenhet i andra hand?",
+                "answer": "Andrahandsuthyrning kräver godkännande från bostadsrättsförening eller hyresvärd. Kontakta oss på 0793-006638 för ansökan och information om processen.",
+                "keywords": ["andrahand", "andra hand", "hyra ut", "andrahandsuthyrning"]
+            },
+            {
+                "question": "Vem ansvarar för brf-lokalerna?",
+                "answer": "Bostadsrättsföreningen äger och ansvarar för alla gemensamma ytor: trapphus, källare, vind, tvättstugor, utvändiga markytor, etc. Medlemmarna äger sina lägenheter genom andelar i föreningen.",
+                "keywords": ["brf", "bostadsrätt", "ansvar", "gemensam", "lokal"]
+            },
+            {
+                "question": "Vad är en underhållsplan?",
+                "answer": "En underhållsplan är ett dokument som beskriver fastighetens skick och planerade underhållsåtgärder de kommande 10-25 åren. Den är obligatorisk för bostadsrättsföreningar och viktig för ekonomisk planering.",
+                "keywords": ["underhållsplan", "plan", "underhåll", "besiktning", "brf"]
+            },
+
+            # Heating, Water, Ventilation
+            {
+                "question": "Elementet är kallt, vad göra?",
+                "answer": "Kolla först att termostaten står på tillräckligt. Om elementet är kallt medan andra i lägenheten är varma kan det vara luft i systemet - försök lufta det. Hjälper ej? Ring 0793-006638.",
+                "keywords": ["element", "kallt", "värme", "lufta", "termostat"]
+            },
+            {
+                "question": "Hur luftrar jag elementet?",
+                "answer": "Vänta tills elementet är varmt. Använd en nyckel/ventilnyckel (eller plånbok) för att vrida på luftskruven på sidan av elementet tills det comes en liten stråle vatten. Stäng sedan till.",
+                "keywords": ["lufta", "element", "värme", "instruktion"]
+            },
+            {
+                "question": "Ventilationen dålig, vad göra?",
+                "answer": "Kolla att ventilationsdon i tak/vägg är öppna och inte täckta. Rengör vid behov. Känner du ändå dålig ventilation, ring 0793-006638 för besiktning.",
+                "keywords": ["ventilation", "fläkt", "luft", "dålig", "fukt"]
+            },
+            {
+                "question": "Vad är normal inomhustemperatur?",
+                "answer": "Enligt gällande regler ska inomhustemperaturen vara minst 20°C under vintersäsong (oktober-april). Vid permanent temperatur under 18°C bör du kontakta oss.",
+                "keywords": ["temperatur", "värme", "kallt", "inomhus", "gräns"]
+            },
+
+            # Keys, Locks, Security
+            {
+                "question": "Jag har tappat min nyckel, vad göra?",
+                "answer": "Är du utelåst, ring jour på 0793-006638 direkt för akut hjälp. Ej utelåst men nyckel borta? Ring 0793-006638 för att beställa ny nyckel/låsbyte. Kostnad kan debiteras vid förlorad nyckel.",
+                "keywords": ["nyckel", "tappat", "borta", "utelåst", "lås"]
+            },
+            {
+                "question": "Låset går inte att öppna, vad göra?",
+                "answer": "Är nyckel runt? Proba varsamt. Ej? Det kan vara fruset vinter - värm med hårfön. Ej hjälp? Ring jour 0793-006638.",
+                "keywords": ["lås", "dörr", "öppna", "fast", "problem"]
+            },
+            {
+                "question": "Får jag byta låset själv?",
+                "answer": "Nej, låsbyten måste göras av behörig låsinstallatör som anlitas av fastighetsägaren. Själv installerade lås godkänns ej och kan behöva bytas ut på din kostnad.",
+                "keywords": ["lås", "byt", "byta", "själv", "installera"]
+            },
+            {
+                "question": "Vad göra vid inbrott?",
+                "answer": "1. Ring polisen 114 14 för anmälan. 2. Ring oss på 0793-006638 för att rapportera skadan och säkra fastigheten. 3. Kontakta ditt försäkringsbolag.",
+                "keywords": ["inbrott", "stöld", "skada", "polis", "anmäl"]
+            },
+
+            # Common property issues
+            {
+                "question": "Avloppet är stoppat, vad göra?",
+                "answer": "Kolla först om det är golvbrunnen (vanligast i badrum) - rensa hår och smuts. Ej hjälp eller gäller köksavlopp? Ring 0793-006638. Avstängning och rot-avdrag kan gälla.",
+                "keywords": ["avlopp", "stop", "propp", "vatten", "backar"]
+            },
+            {
+                "question": "Mögel och fukt i bostad?",
+                "answer": "Fukt och mögel är allvarligt. Vid misstanke om fuktskada, ring 0793-006638 direkt för besiktning. Ventilera inte överdrivet - fuktens källa måste identifieras.",
+                "keywords": ["fukt", "mögel", "lukt", "luktar", "fuktig"]
+            },
+            {
+                "question": "Vem ansvarar för snöröjning?",
+                "answer": "Fastighetsägaren ansvarar för snöröjning och halkbekämpning på gemensamma ytor och vid entréer. Hyresgästen/ägare sköter sin egen parkering/balkong om inte annat överenskommits.",
+                "keywords": ["snö", "snöröjning", "halka", "is", "vinter"]
+            },
+            {
+                "question": "Grannar stör med ljud, vad göra?",
+                "answer": "Vid akut nattstörning (22-06): ring jour på 0793-006638. Dagtid: kontakta grannen först eller ring oss på 0793-006638 för medling.",
+                "keywords": ["stör", "oljud", "granne", "ljud", "natt"]
+            },
+
+            # Insurance & Damage
+            {
+                "question": "Gäller min hemförsäkring vid skada?",
+                "answer": "Hemförsäkring gäller för din egendom (möbler, kläder, etc). Fastigheten är oftast försäkrad genom fastighetsägarens fastighetsförsäkring. Vid skada - kontakta ditt försäkringsbolag och oss.",
+                "keywords": ["försäkring", "hemförsäkring", "skada", "ansvar"]
+            },
+            {
+                "question": "Vem betalar vid vattenskada?",
+                "answer": "Fastighetsägarens fastighetsförsäkring gäller för skador på fastigheten (golv, väggar, fast inredning). Din hemförsäkring gäller för dina saker. Vid vattenskada - ring jour 0793-006638 direkt för att begränsa skadan.",
+                "keywords": ["vattenskada", "vatten", "läcka", "försäkring", "betala"]
+            },
+
+            # Moving & Administration
+            {
+                "question": "Hur gör jag en flyttanmälan?",
+                "answer": "Kontakta oss på 0793-006638 minst en månad innan flytt. För BRF-medlemmar: kontakta även föreningen för överlåtelsebeslut. Nycklar överlämnas på överenskommen tid.",
+                "keywords": ["flytt", "utflytt", "inflytt", "flyttanmälan", "nyckel"]
+            },
+            {
+                "question": "Vad är en besiktning?",
+                "answer": "Besiktning innebär att en besiktningsman granskar fastigheten för att identifiera skador, underhållsbehov och ålder på olika delar. Det görs vid överlåtelse, renovering, eller periodiskt för underhållsplanering.",
+                "keywords": ["besiktning", "besiktiga", "genomgång", "skick"]
+            },
+
+            # Commercial properties
+            {
+                "question": "Hanterar ni kommersiella fastigheter?",
+                "answer": "Ja, vi förvaltar kommersiella fastigheter såsom kontor, butiker, lager och industri. Vi erbjuder skräddarsydda lösningar beroende på verksamhetens behov.",
+                "keywords": ["kommersiell", "lokal", "kontor", "butik", "företag"]
+            },
+            {
+                "question": "Vad ingår i lokalvård för kontor?",
+                "answer": "Lokalvård kan inkludera: städning, fönsterputs, toalettstädning, pappershantering, och grönyteskötsel. Vi skräddarsyr avtal efter behov.",
+                "keywords": ["lokalvård", "städ", "kontor", "lokal"]
+            },
         ]
 
         from rag import FAQManager
@@ -154,11 +301,38 @@ class SupportStarterBot:
 
         # Add company info as knowledge chunks
         from rag import KnowledgeChunk
+
+        # Company contact info
         rag.add_knowledge(KnowledgeChunk(
             id="company_info",
-            content=f"COMPANY: {self.config.COMPANY_NAME}. Phone: {self.config.phone}. Email: {self.config.contact_email}. Website: {self.config.website}. Business hours: {self.config.business_hours}.",
+            content=f"COMPANY: {self.config.COMPANY_NAME}. Phone: {self.config.phone}. Email: {self.config.contact_email}. Website: {self.config.website}. Business hours: {self.config.business_hours}. Locations: Johanneberg, Partille, Mölndal.",
             category="contact",
-            keywords=["kontakt", "ring", "mejl", "telefon", "öppettider"],
+            keywords=["kontakt", "ring", "mejl", "telefon", "öppettider", "adress", "plats"],
+            priority=3
+        ))
+
+        # Property management industry knowledge
+        rag.add_knowledge(KnowledgeChunk(
+            id="property_management_basics",
+            content="Fastighetsförvaltning innefattar: 1) Drift - dagliga operativa åtgärder som städning, trädgård, belysning. 2) Underhåll - förebyggande och avhjälpande underhåll av byggnad, installationer, mark. 3) Ekonomisk förvaltning - bokföring, budget, fakturering, årsredovisning. 4) Hyresadministration - kontrakt, hyresavisering, förhandling. 5) Styrelsesupport - för BRF:er med protokoll, stadgar, årsmöten.",
+            category="industry",
+            keywords=["förvaltning", "fastighet", "drift", "underhåll", "ekonomi", "tjänster"],
+            priority=2
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="tenant_landlord_responsibility",
+            content="ANSVARSFÖRDELNING: Hyresgäst/Ägare ansvarar för: bostadsinredning (tapeter, golv), egna vitvaror, glödlampor, lätta reparationer (skruva upp luckor, byta packningar kran), borstädningsutrustning, egen säkring. Fastighetsägare ansvarar för: byggnadskonstruktion, tak, fasad, fönster (utom renhållning), VVS-installationer (rör, element), el-central, stammar, gemensamma ytor, mark och grönytor, fastighetsnära parkering.",
+            category="responsibility",
+            keywords=["ansvar", "vem", "hyresgäst", "fastighetsägare", "reparation", "underhåll"],
+            priority=3
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="emergency_urgency_levels",
+            content="AKUTGRUPPER: 1) Kritiskt - omedelbar fara för liv/egendom: brand, gasläcka, översvämning, inbrott pågående. Ring 112 + jour 0793-006638. 2) Högt - påverkar boständ/tjänst betydande: ingen värme vinter, inget vatten, strömavbrott hela fastigheten, utelåsning. Ring jour 0793-006638. 3) Medium - besvärande men ej akut: droppande kran, svaga ventilation, trasig armatur. Ring 0793-006638 vardagstid. 4) Lågt - önskemål/frågor: allmän info, bokning, ärenden som kan vänta.",
+            category="emergency",
+            keywords=["akut", "urgens", "jour", "prioriter", "kritiskt"],
             priority=3
         ))
 
