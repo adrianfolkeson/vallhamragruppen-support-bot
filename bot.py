@@ -459,7 +459,7 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             return "Jag ber om ursäkt för besväret. Låt mig hjälpa dig vidare. Kan du beskriva vad du behöver hjälp med?"
 
         # Default response
-        return f"Tack för ditt meddelande. För att ge dig bästa möjliga hjälp, kontakta oss på {self.config.phone} eller {self.config.contact_email}."
+        return f"Vad gäller? Ring {self.config.phone} eller {self.config.contact_email} så hjälper vi dig."
 
     def check_proactive_message(self, session_id: str) -> Optional[str]:
         """Check if should send proactive message"""

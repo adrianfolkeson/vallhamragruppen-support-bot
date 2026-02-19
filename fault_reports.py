@@ -201,72 +201,66 @@ class FaultReportSystem:
     def get_response_for_urgency(self, urgency: UrgencyLevel, category: FaultCategory, description: str) -> str:
         """
         Get appropriate response based on urgency and category
-        This is the "logical brain" that asks clarifying questions
+        Sounds like experienced property manager - direct, practical, asks right questions
         """
         # CRITICAL - Immediate action needed
         if urgency == UrgencyLevel.CRITICAL:
             if category == FaultCategory.WATER:
                 return (
-                    "Jag förstår att du har en allvarlig vattenläcka. "
-                    "Stäng av vattnet om du kan (kranen under diskhon). "
-                    "Ring omedelbart vår jour på 0793-006638. "
-                    "Var finns läckan? (Kök, badrum, tvättstuga?)"
+                    "Vattenläcka - stäng av vattnet under diskhon om möjligt. "
+                    "Ring jour på 0793-006638 direkt. Var i lägenheten läcker det?"
                 )
             elif category == FaultCategory.SECURITY:
                 return (
-                    "Jag förstår att du har problem med låsning. "
-                    "Ring oss direkt på 0793-006638 för omedelbar hjälp. "
-                    "Vilken dörr gäller det och var är du nu?"
+                    "Utelåst? Ring jour på 0793-006638 nu. Vilken adress?"
                 )
             else:
                 return (
-                    "Jag förstår att detta är akut. Ring omedelbart vår jour på 0793-006638. "
-                    "Kan du beskriva kort vad som har hänt?"
+                    "Akut ärende - ring jour på 0793-006638 direkt. Vad har hänt?"
                 )
 
         # HIGH - Important but not emergency
         elif urgency == UrgencyLevel.HIGH:
             if category == FaultCategory.WATER:
                 return (
-                    "Jag förstår att ni saknar vatten. "
-                    "Gäller det hela fastigheten eller bara din lägenhet? "
-                    "Ring oss på 0793-006638 om det behövs akut."
+                    "Inget vatten. Gäller det hela fastigheten eller bara din lägenhet? "
+                    "Kolla med grannen. Ring 0793-006638 om det inte återkommer."
                 )
             elif category == FaultCategory.HEATING:
                 return (
-                    "Jag förstår att det är kallt. "
-                    "Har du kontrollerat termostaten på elementen? "
-                    "Gäller det ett specifikt element eller hela lägenheten?"
+                    "Ingen värme. Kollat termostaten på elementen? Gäller ett element eller hela lägenheten? "
+                    "Ring 0793-006638 om det inte hjälper."
                 )
             elif category == FaultCategory.ELECTRICAL:
                 return (
-                    "Strömproblem noterat. Gäller det en specifik krets eller hela lägenheten? "
-                    "Har du kollat säkringsskärmet i trapphuset?"
+                    "Strömproblem. Kolla säkringsskärmet i trapphus först. Gäller det hela lägenheten? "
+                    "Ring 0793-006638."
                 )
             else:
                 return (
-                    "Jag förstår att detta är viktigt. Berätta lite mer så jag kan hjälpa dig på bästa sätt."
+                    "Viktigt ärende. Ring 0793-006638 och berätta vad som hänt."
                 )
 
         # MEDIUM - Needs more info to determine urgency
         elif urgency == UrgencyLevel.MEDIUM:
             if category == FaultCategory.WATER:
                 return (
-                    "Vattenproblem noterat. För att hjälpa dig på bästa sätt: "
-                    "är det en vattenläcka eller droppar det från en kran? "
-                    "Var i lägenheten är problemet?"
+                    "Vattenproblem. Läcka eller droppande kran? Var i lägenheten? "
+                    "Är det farligt för el eller golv?"
+                )
+            elif category == FaultCategory.APPLIANCE:
+                return (
+                    "Vitvaror. Köpt av dig eller ingår i fastigheten? Ring 0793-006638."
                 )
             else:
                 return (
-                    "Tack för din felanmälan. Kan du beskriva lite mer vad som hänt "
-                    "och var i fastigheten problemet finns?"
+                    "Beskriv problemet. Var i fastigheten? Är det akut eller kan vänta?"
                 )
 
         # LOW - General inquiry
         else:
             return (
-                "Vad kan jag hjälpa dig med? "
-                "Jag kan hjälpa till med felanmälan, frågor om våra tjänster, eller bokning."
+                "Vad gäller? Felanmälan når du på 0793-006638. Berätta vad som hänt."
             )
 
     def collect_fault_report(self, message: str, session_data: Dict) -> Dict:

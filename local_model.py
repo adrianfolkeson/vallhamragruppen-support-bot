@@ -20,128 +20,128 @@ class LocalModel:
         self.patterns = {
             # Contact & Location
             r"\b(kontakt|telefon|ring|nummer|phone|call)\b": {
-                "response": f"Du kan nå {company_name} på telefon 0793-006638 eller via email info@vallhamragruppen.se. Vi finns i Johanneberg, Partille och Mölndal.",
+                "response": "Ring oss på 0793-006638 eller mejla info@vallhamragruppen.se. Vi finns i Johanneberg, Partille och Mölndal.",
                 "intent": "contact",
                 "lead_score": 1
             },
-            r"\b(adress|plats|var|var finns ni|hitta|h whereabouts)\b": {
-                "response": f"{company_name} verkar i Johanneberg, Partille och Mölndal med omnejd. Kontakt: info@vallhamragruppen.se, Tel: 0793-006638.",
+            r"\b(adress|plats|var|var finns ni|hitta)\b": {
+                "response": "Vi verkar i Johanneberg, Partille och Mölndal. Kontakt: 0793-006638, info@vallhamragruppen.se",
                 "intent": "location",
                 "lead_score": 1
             },
             r"\b(öppettider|när är ni öppna|öppet|öppettid|hours)\b": {
-                "response": "Våra kontor har öppet måndag-fredag 08:00-17:00. För akuta ärenden utanför kontorstid, ring oss.",
+                "response": "Mån-Fre 08:00-17:00. Akuta ärenden: ring jour på 0793-006638.",
                 "intent": "hours",
                 "lead_score": 1
             },
             r"\b(email|e-post|mejla|mail|adress)\b": {
-                "response": "Du når oss på info@vallhamragruppen.se",
+                "response": "info@vallhamragruppen.se",
                 "intent": "email",
                 "lead_score": 1
             },
 
             # FAQ - Common issues
             r"\b(felanmälan|fel|anmäl|reparation|problem|fungerar inte|broken|issue)\b": {
-                "response": "Felanmälan görs enklast via vår hemsida under 'Kontakta oss' eller genom att ringa 0793-006638. För akuta ärenden, ring vår jour.",
+                "response": "Felanmälan: ring 0793-006638 eller använd formulär på hemsidan. Akuta ärenden prioriteras.",
                 "intent": "technical_issue",
                 "lead_score": 2
             },
 
             # URGENT - Water issues - distinguish between critical flood and dripping
             r"\b(översvämning|vattenläcka.*(akut|stort|forsar)|brustet.*rör|står.*vatten|forsar.*vatten|emergency|flood)\b": {
-                "response": "Jag förstår att du har en allvarlig vattenläcka! Stäng av vattnet om du kan (kranen under diskhon). Ring omedelbart vår jour på 0793-006638. Var finns läckan?",
+                "response": "Vattenläcka - stäng av vattnet under diskhon. Ring jour 0793-006638 direkt. Var läcker det?",
                 "intent": "water_critical",
                 "lead_score": 2
             },
             r"\b(droppar|läcker|kran|diskmaskin|tvättmaskin|avlopp|vatten)\b": {
-                "response": "Jag förstår att du har problem med vatten. För att hjälpa dig: är det en vattenläcka eller droppar det från en kran/apparat? Var i lägenheten är problemet?",
+                "response": "Vattenproblem. Läcka eller droppande kran? Var i lägenheten? Är det farligt för el eller golv? Ring 0793-006638.",
                 "intent": "water_question",
                 "lead_score": 2
             },
 
-            # URGENT - Lost keys / Lockouts (CRITICAL - people locked out)
+            # URGENT - Lost keys / Lockouts
             r"\b(tappat.*nyckel|nyckel.*borta|glömde.*nyckel|utelåst|låst.*ute|kommer.*inte.*in|kan.*ej.*komma|låset.*går.*inte)\b": {
-                "response": "Jag förstår att du har problem med nyckeln/låset. Är du utelåst just nu? Ring oss direkt på 0793-006638 för omedelbar hjälp. Vilken dörr gäller det?",
+                "response": "Utelåst? Ring jour 0793-006638 nu. Vilken adress?",
                 "intent": "lockout_critical",
                 "lead_score": 2
             },
             r"\b(nyckel|lås|dörr|låset)\b": {
-                "response": "Jag hörde att du nämnde nyckel eller lås. Vad är problemet - har du tappat nyckeln, fungerar inte låset, eller är du utelåst?",
+                "response": "Nyckel- eller låsproblem. Tappad nyckel eller trasigt lås? Ring 0793-006638.",
                 "intent": "lock_question",
                 "lead_score": 2
             },
 
-            # URGENT - No heat (critical but not emergency)
+            # URGENT - No heat
             r"\b(ingen värme|kallt|fryser|elementen|element fungerar|dricks inte|inget varmt|det är kallt|kyla|elementen ej|värme ej)\b": {
-                "response": "Jag förstår att det är kallt. Har du provat termostaten? Ring oss på 0793-006638 så hjälper vi dig att felsöka värmen. Akuta ärenden prioriteras.",
+                "response": "Ingen värme. Kollat termostaten på elementen? Gäller ett element eller hela lägenheten? Ring 0793-006638.",
                 "intent": "heating_issue",
                 "lead_score": 2
             },
 
             # URGENT - No electricity
             r"\b(ingen ström|strömavbrott|slut|inte fungerar|mörkt|ljuset fungerar ej|elektricitet|el av|avbrott)\b": {
-                "response": "Strömavbrott? Kontrollera först din säkringsskärm i trapphus. Är hela fastigheten drabbad? Ring 0793-006638 om det är akut.",
+                "response": "Strömproblem. Kolla säkringsskärmet i trapphus först. Gäller hela lägenheten? Ring 0793-006638.",
                 "intent": "electric_issue",
                 "lead_score": 2
             },
 
-            # Broken things (medium urgency)
+            # Broken things
             r"\b(gått sönder|trasig sönder|tras|sönder|tillbörd sönder|har gått sönder)\b": {
-                "response": "Jag förstår att något har gått sönder. Vad har hänt? Beskriv gärna vad som är trasigt så att vi kan hjälpa dig på bästa sätt. Ring 0793-006638 för snabb hjälp.",
+                "response": "Gått sönder. Vad har hänt? Är det farligt? Ring 0793-006638.",
                 "intent": "damaged_item",
                 "lead_score": 2
             },
             r"\b(vem är ni|vilka är ni|om företaget|bolaget|company)\b": {
-                "response": f"{company_name} är ett fastighetsförvaltningsföretag som erbjuder drift och underhåll, ekonomisk förvaltning och hyresadministration för bostadsrättsföreningar och kommersiella fastigheter.",
+                "response": f"{company_name} förvaltar fastigheter - drift, underhåll, ekonomi och hyresadministration för bostadsrättsföreningar och kommersiella fastigheter.",
                 "intent": "about",
                 "lead_score": 1
             },
             r"\b(tjänster|gör ni|erbjuder|service|services)\b": {
-                "response": "Vi erbjuder fastighetsförvaltning inklusive drift och underhåll, ekonomisk förvaltning, hyresadministration och projektledning.",
+                "response": "Fastighetsförvaltning: drift och underhåll, ekonomisk förvaltning, hyresadministration, projektledning.",
                 "intent": "services",
                 "lead_score": 2
             },
             r"\b(hej|tjena|hallå|god dag|hello|hi|hey)\b": {
-                "response": "Hej! Välkommen till Vallhamragruppen. Hur kan jag hjälpa dig idag?",
+                "response": "Hej! Vallhamragruppen här. Vad kan jag hjälpa med?",
                 "intent": "greeting",
                 "lead_score": 1
             },
             r"\b(tack|tackar|tacksam|thanks|thank)\b": {
-                "response": "Välkommen! Om du har fler frågor är det bara att fråga.",
+                "response": "Varsågod! Fler frågor - bara fråga.",
                 "intent": "gratitude",
                 "lead_score": 1
             },
             r"\b(hejdå|adjö|vi ses|bye|goodbye)\b": {
-                "response": "Ha en bra dag! Välkommen tillbaka om du har fler frågor.",
+                "response": "Ha en bra dag!",
                 "intent": "goodbye",
                 "lead_score": 1
             },
 
             # Booking & Meetings
             r"\b(boka|bokning|möte|visning|träff|meeting|book|appointment)\b": {
-                "response": "Vad roligt att du vill boka ett möte! Du kan nå oss på 0793-006638 eller via info@vallhamragruppen.se. När passar det bäst för dig?",
+                "response": "Boka möte: ring 0793-006638 eller info@vallhamragruppen.se. När passar?",
                 "intent": "booking_request",
                 "lead_score": 5
             },
             r"\b(pris|kostar|kostnad|betala|price|pricing|how much)\b": {
-                "response": "Prissättning sker individuellt baserat på fastighetens storlek och tjänsteomfattning. Vill du ha en kostnadsfri offert? Ring oss på 0793-006638.",
+                "response": "Pris sätts individuellt efter fastighet och tjänsteomfattning. Offert? Ring 0793-006638.",
                 "intent": "pricing_question",
                 "lead_score": 3
             },
             r"\b(offert|offer|quote|prislista|price list)\b": {
-                "response": "Vi ger gärna en kostnadsfri offert! Berätta gärna lite om din fastighet så kan vi ge dig en uppskattning. Du kan också ringa 0793-006638.",
+                "response": "Kostnadsfri offert. Berätta om fastigheten så hjälper vi dig. Ring 0793-006638.",
                 "intent": "pricing_question",
                 "lead_score": 4
             },
 
-            # Negative sentiment handling
+            # Negative sentiment
             r"\b(arg|förbannad|dålig|terrible|horrible|hate)\b": {
-                "response": "Jag förstår att du är frustrerad. Låt mig koppla dig till en person som kan hjälpa dig direkt. Ring oss på 0793-006638.",
+                "response": "Jag förstår. Ring 0793-006638 så hjälper en kollega dig direkt.",
                 "intent": "complaint",
                 "lead_score": 1
             },
             r"\b(chef|manager|ledning|överordnad|mänsklig|human|person)\b": {
-                "response": "Självklart, jag kopplar dig till en kollega. Ring oss på 0793-006638 så hjälper vi dig direkt.",
+                "response": "Självklart. Ring 0793-006638 så hjälper vi dig.",
                 "intent": "escalation_demand",
                 "lead_score": 1
             },
