@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vallhamragruppen AB - AI Support Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Landing Page Section */
+        .landing-page {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        .landing-page h1 {
+            color: #1a1a2e;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .landing-page .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature h3 {
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .feature p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-header .avatar {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .chat-header .info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+        }
+
+        .chat-header .info p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .chat-header .status {
+            margin-left: auto;
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message .bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message.bot .bubble {
+            background: white;
+            color: #1a1a2e;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.typing .bubble {
+            background: white;
+            padding: 15px 20px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #ccc;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Suggested actions */
+        .suggested-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .action-button {
+            padding: 8px 14px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Chat input */
+        .chat-input-area {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-input-area button {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .chat-input-area button:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Debug panel */
+        .debug-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a2e;
+            border-radius: 10px;
+            color: #4ade80;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .debug-panel.show {
+            display: block;
+        }
+
+        .debug-panel h4 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .debug-panel .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .debug-panel .metric:last-child {
+            border-bottom: none;
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+        }
+
+        .welcome-message .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+
+        .quick-action {
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .quick-action:hover {
+            background: #e0e0e0;
+        }
+
+        .quick-action .emoji {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Landing Page Content -->
+        <div class="landing-page">
+            <h1>🏢 Vallhamragruppen AB</h1>
+            <p class="subtitle">AI-driven kundsupport för fastighetsförvaltning</p>
+
+            <div class="features">
+                <div class="feature">
+                    <h3>⚡ Snabba svar</h3>
+                    <p>Omedelbara svar på vanliga frågor dygnet runt.</p>
+                </div>
+                <div class="feature">
+                    <h3>🎯 Smart förvaltning</h3>
+                    <p>Automatiserad felanmälan och ärendehantering.</p>
+                </div>
+                <div class="feature">
+                    <h3>📊 Lead-scoring</h3>
+                    <p>Identifiera och prioritera seriösa förfrågningar.</p>
+                </div>
+                <div class="feature">
+                    <h3>🔄 Eskalering</h3>
+                    <p>Skicka komplexa ärenden automatiskt till rätt person.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 10px;">
+                <h3 style="color: #0369a1; margin-bottom: 10px;">Demo</h3>
+                <p style="color: #555;">Prova chatten till höger! Testa att fråga om:</p>
+                <ul style="color: #555; margin-left: 20px; margin-top: 10px;">
+                    <li>Felanmälan</li>
+                    <li>Priser och tjänster</li>
+                    <li>Vilka områden ni verkar i</li>
+                    <li>Boka möte</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Chat Widget -->
+        <div class="chat-widget">
+            <div class="chat-header">
+                <div class="avatar">🏢</div>
+                <div class="info">
+                    <h3>Vallhamragruppen</h3>
+                    <p>Digital assistent</p>
+                </div>
+                <div class="status"></div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message" id="welcomeMessage">
+                    <div class="icon">👋</div>
+                    <p>Välkommen! Jag hjälper dig med frågor om våra fastigheter och tjänster.</p>
+                </div>
+            </div>
+
+            <div class="quick-actions" id="quickActions">
+                <div class="quick-action" onclick="sendQuickMessage('Hur gör jag en felanmälan?')">
+                    <span class="emoji">🔧</span>
+                    Felanmälan
+                </div>
+                <div class="quick-action" onclick="sendQuickMessage('Vilka områden verkar ni i?')">
+                    <span class="emoji">📍</span>
+                    Våra områden
+                </div>
+                <div class="quick-action" onclick="sendQuickMessage('Vad kostar er förvaltning?')">
+                    <span class="emoji">💰</span>
+                    Priser
+                </div>
+                <div class="quick-action" onclick="sendQuickMessage('Jag vill boka ett möte')">
+                    <span class="emoji">📅</span>
+                    Boka möte
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <input
+                    type="text"
+                    id="chatInput"
+                    placeholder="Skriv ditt meddelande..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button onclick="sendMessage()" id="sendButton">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="debug-panel" id="debugPanel">
+                <h4>🔍 Debug Info</h4>
+                <div class="metric">
+                    <span>Intent:</span>
+                    <span id="debugIntent">-</span>
+                </div>
+                <div class="metric">
+                    <span>Confidence:</span>
+                    <span id="debugConfidence">-</span>
+                </div>
+                <div class="metric">
+                    <span>Sentiment:</span>
+                    <span id="debugSentiment">-</span>
+                </div>
+                <div class="metric">
+                    <span>Lead Score:</span>
+                    <span id="debugLeadScore">-</span>
+                </div>
+                <div class="metric">
+                    <span>Action:</span>
+                    <span id="debugAction">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = 'session_' + Date.now();
+        let messageHistory = [];
+        let isTyping = false;
+
+        const API_URL = 'http://localhost:8000/chat'; // Change this to your backend URL
+
+        // Bot responses for demo (when backend is not available)
+        const demoResponses = {
+            'felanmälan': 'Felanmälan görs enklast via vår hemsida under "Kontakta oss" eller genom att ringa oss på 0793-006638. För akuta ärenden, ring vår jour.',
+            'område': 'Vi verkar främst i Göteborg, Mölndal och Partille med omnejd. Har du en specifik fastighet i åtanke?',
+            'pris': 'Prissättning sker individuellt baserat på fastighetens storlek och tjänsteomfattning. Vill du ha en kostnadsfri offert?',
+            'boka': 'Vad roligt att du vill boka ett möte! Du kan nå oss på 0793-006638 eller så kan jag hjälpa dig att boka via vår hemsida. Vad passar bäst?',
+            'default': 'Tack för ditt meddelande. Hur kan jag hjälpa dig vidare med din fastighetsfråga?'
+        };
+
+        function addMessage(text, isUser, suggestedActions = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+
+            // Hide welcome message
+            if (welcomeMessage) {
+                welcomeMessage.style.display = 'none';
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+
+            messageDiv.appendChild(bubble);
+            messagesContainer.appendChild(messageDiv);
+
+            // Add suggested actions if any
+            if (suggestedActions && suggestedActions.length > 0) {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'suggested-actions';
+
+                suggestedActions.forEach(action => {
+                    const button = document.createElement('button');
+                    button.className = 'action-button';
+                    button.textContent = action;
+                    button.onclick = () => sendQuickMessage(action);
+                    actionsDiv.appendChild(button);
+                });
+
+                messagesContainer.appendChild(actionsDiv);
+            }
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing';
+            typingDiv.id = 'typingIndicator';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+
+            typingDiv.appendChild(bubble);
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function updateDebug(response) {
+            const debugPanel = document.getElementById('debugPanel');
+            debugPanel.classList.add('show');
+
+            document.getElementById('debugIntent').textContent = response.intent || '-';
+            document.getElementById('debugConfidence').textContent = response.confidence ? (response.confidence * 100).toFixed(0) + '%' : '-';
+            document.getElementById('debugSentiment').textContent = response.sentiment || '-';
+            document.getElementById('debugLeadScore').textContent = response.lead_score ? response.lead_score + '/5' : '-';
+            document.getElementById('debugAction').textContent = response.action || '-';
+        }
+
+        async function sendMessage() {
+            if (isTyping) return;
+
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // Add user message
+            addMessage(text, true);
+            messageHistory.push({ role: 'user', content: text });
+            input.value = '';
+            isTyping = true;
+
+            // Show typing indicator
+            showTyping();
+
+            try {
+                // Try to call backend API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        session_id: sessionId,
+                        conversation_history: messageHistory
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    hideTyping();
+                    addMessage(data.reply, false, data.suggested_responses);
+                    updateDebug(data);
+                    messageHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                // Fallback to demo responses
+                hideTyping();
+
+                // Simulate processing delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                let response = demoResponses.default;
+                const lowerText = text.toLowerCase();
+
+                if (lowerText.includes('fel') || lowerText.includes('anmäl') || lowerText.includes('reparation')) {
+                    response = demoResponses.felanmälan;
+                } else if (lowerText.includes('område') || lowerText.includes('var') || lowerText.includes('stad')) {
+                    response = demoResponses.område;
+                } else if (lowerText.includes('pris') || lowerText.includes('kostnad') || lowerText.includes('betala')) {
+                    response = demoResponses.pris;
+                } else if (lowerText.includes('boka') || lowerText.includes('möte') || lowerText.includes('visning')) {
+                    response = demoResponses.boka;
+                }
+
+                addMessage(response, false, ['Ring 0793-006638', 'Mejla oss', 'Till kontaktsida']);
+
+                // Update debug with simulated data
+                updateDebug({
+                    intent: 'general_inquiry',
+                    confidence: 0.85,
+                    sentiment: 'neutral',
+                    lead_score: 2,
+                    action: 'none'
+                });
+            }
+
+            isTyping = false;
+        }
+
+        function sendQuickMessage(text) {
+            document.getElementById('chatInput').value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
