@@ -48,7 +48,7 @@ class AntiPromptInjection:
             r"(?i)(dump|leak|extract).*(?:system|prompt|instructions)",
 
             # Jailbreak attempts
-            r"(?i)(jailbreak|jail break|dan|developer mode|unrestricted)",
+            r"(?i)(jailbreak|jail break|DAN mode|developer mode|unrestricted)",
             r"(?i)(no constraints|without rules|bypass filters|ignore safety)",
             r"(?i)(above instructions|previous instructions|system message)",
 

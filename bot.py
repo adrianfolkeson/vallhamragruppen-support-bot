@@ -119,19 +119,243 @@ class SupportStarterBot:
         """Create knowledge base with company info and property management knowledge"""
         rag = SimpleRAG()
 
-        # Add comprehensive FAQ
+        # Add comprehensive FAQ - organized by category
         faq_data = [
-            # Basic contact & info
+            # ============================================
+            # LEDIGA LÄGENHETER & BOSTÄDER
+            # ============================================
+            {
+                "question": "Har ni några lediga lägenheter just nu?",
+                "answer": "För aktuellt utbud av lediga lägenheter och lokaler, kontakta oss på 0793-006638 eller info@vallhamragruppen.se. Vi hjälper dig hitta det du söker i Johanneberg, Partille och Mölndal.",
+                "keywords": ["ledig", "lediga", "lägenhet", "bostad", "ledigt", "tom", "utbud"]
+            },
+            {
+                "question": "Finns det någon 2:a ledig i Partille?",
+                "answer": "Vi har olika objekt tillgängliga i våra områden. För specifika frågor om storlek och plats, ring 0793-006638 så berättar vi vad vi kan erbjuda just nu.",
+                "keywords": ["2:a", "tvåa", "partille", "ledig", "lägenhet", "objekt"]
+            },
+            {
+                "question": "Jag söker en 3:a i Göteborg – vad har ni?",
+                "answer": "Vi verkar i Johanneberg, Partille och Mölndal (Göteborgsområdet). Ring 0793-006638 för att se vad vi har tillgängligt som matchar din sökning.",
+                "keywords": ["3:a", "trea", "göteborg", "söker", "letar", "matchar"]
+            },
+            {
+                "question": "Har ni något under 10 000 kr/mån?",
+                "answer": "Hyror varierar beroende på lägenhetens storlek, standard och läge. Kontakta oss på 0793-006638 för aktuell information om hyresnivåer och tillgängliga objekt.",
+                "keywords": ["hyra", "pris", "10000", "kr", "månad", "billig", "dyr"]
+            },
+            {
+                "question": "Finns det lägenheter med balkong?",
+                "answer": "Många av våra lägenheter har balkong eller uteplats. Utbudet varierar. Ring 0793-006638 för att höra vad som finns tillgängligt just nu.",
+                "keywords": ["balkong", "uteplats", "terrass", "uterum"]
+            },
+            {
+                "question": "Har ni parkeringsplats att hyra?",
+                "answer": "Parkering kan finnas tillgängligt beroende på fastighet. Ring 0793-006638 för att fråga om parkeringsmöjligheter vid din specifika fastighet.",
+                "keywords": ["parkering", "p-plats", "garage", "bil", "parkera"]
+            },
+
+            # ============================================
+            # KOMMERSIELLA LOKALER
+            # ============================================
+            {
+                "question": "Har ni några lediga lokaler?",
+                "answer": "Vi förvaltar kommersiella fastigheter och har ibland lokaler tillgängliga. Ring 0793-006638 för att höra vad vi kan erbjuda just nu.",
+                "keywords": ["lokal", "kontor", "butik", "företag", "kommersiell", "ledig"]
+            },
+            {
+                "question": "Jag söker en mindre kontorslokal i Mölndal – finns det något?",
+                "answer": "Vi har lokaler i Mölndal och omnejd. Kontakta oss på 0793-006638 för att diskutera dina behov och se vad som passar.",
+                "keywords": ["kontorslokal", "mölndal", "mindre", "företag", "lokal"]
+            },
+            {
+                "question": "Vad kostar era kommersiella lokaler per kvadratmeter?",
+                "answer": "Hyror för kommersiella lokaler sätts individuellt baserat på läge, standard och ytans karaktär. Kontakta oss för offert på 0793-006638.",
+                "keywords": ["kvm", "kvadratmeter", "kommersiell", "hyra", "lokal", "pris"]
+            },
+            {
+                "question": "Ingår driftkostnader i hyran för lokaler?",
+                "answer": "Det varierar beroende på avtal. Vissa hyror inkluderar driftkostnader, andra är separat. Ring 0793-006638 för specifik information.",
+                "keywords": ["driftkostnad", "el", "värme", "vatten", "ingår", "lokal"]
+            },
+
+            # ============================================
+            # OMRÅDEN & LÄGE
+            # ============================================
+            {
+                "question": "I vilka områden har ni fastigheter?",
+                "answer": "Vi verkar främst i Johanneberg, Partille och Mölndal med omnejd. Kontakta oss för specifik information om enskilda fastigheter.",
+                "keywords": ["område", "plats", "location", "var", "stad", "fastighet"]
+            },
+            {
+                "question": "Har ni något nära kollektivtrafik?",
+                "answer": "Våra områden i Johanneberg, Partille och Mölndal har goda kommunikationer med buss och spårvagn nära. Ring 0793-006638 för specifik adressinformation.",
+                "keywords": ["kollektivtrafik", "buss", "spårvagn", "tåg", "kommunikation", "nära"]
+            },
+            {
+                "question": "Finns det bostäder nära skolor och förskolor?",
+                "answer": "Ja, våra områden har närhet till skolor och förskolor. För specifik information om en viss fastighet, ring 0793-006638.",
+                "keywords": ["skola", "förskola", "barn", "nära", "område"]
+            },
+
+            # ============================================
+            # HYRA & BETALNING
+            # ============================================
+            {
+                "question": "Vad ingår i hyran?",
+                "answer": "Hyran inkluderar oftast värme och vatten. Vissa fastigheter har även bredband och kabel-TV ingående. Det varierar mellan fastigheter - ring 0793-006638 för specifik information.",
+                "keywords": ["hyra", "ingår", "inkluderar", "innehåll", "vad ingår"]
+            },
+            {
+                "question": "Ingår värme och vatten?",
+                "answer": "Ja, i de flesta av våra lägenheter ingår värme och vatten i hyran. Vid osäkerhet för specifik fastighet, ring 0793-006638.",
+                "keywords": ["värme", "vatten", "ingår", "hyra", "inkluderat"]
+            },
+            {
+                "question": "Hur betalar jag hyran?",
+                "answer": "Hyra betalas månadsvis via autogiro eller bankgiro. Kopia på avtal och instruktioner får du vid inflytt. Ring 0793-006638 vid frågor.",
+                "keywords": ["betala", "hyra", "betalning", "autogiro", "bankgiro", "bank"]
+            },
+            {
+                "question": "När ska hyran vara betald?",
+                "answer": "Hyran förfaller till betalning varje månad senast på förfallodagen som framgår av ditt hyresavtal. Vanligtvis sista dagen i månaden.",
+                "keywords": ["förfallodag", "sista", "betalningsdag", "hyra", "när"]
+            },
+            {
+                "question": "Tar ni kreditupplysning vid ansökan?",
+                "answer": "Ja, vi gör vanligtvis en kreditprövning vid uthyrning för att säkerställa hyresgästens betalningsförmåga.",
+                "keywords": ["kreditupplysning", "kredit", "prövning", "ansökan", "kontroll"]
+            },
+
+            # ============================================
+            # ANSÖKAN & VISNING
+            # ============================================
+            {
+                "question": "Hur ansöker jag om en lägenhet?",
+                "answer": "Ansökan om lägenhet görs genom att kontakta oss på 0793-006638 eller info@vallhamragruppen.se. Vi ställer några frågor om dina behov och bokat in visning om intresse.",
+                "keywords": ["ansöka", "ansökan", "söka", "komma åt", "intresse"]
+            },
+            {
+                "question": "Vilka dokument behöver jag skicka in?",
+                "answer": "Vid ansökan kan vi behöva identifieringshandling, inkomstbevis/anställningsintyg och eventuella referenser. Kontakta oss på 0793-006638 för detaljer.",
+                "keywords": ["dokument", "id", "inkomstbevis", "anställningsintyg", "referens", "skicka"]
+            },
+            {
+                "question": "Hur lång är kötiden?",
+                "answer": "Kötid varierar beroende på typ av lägenhet och område. För aktuellt läge, ring 0793-006638 - vi kan ofta hjälpa snabbare än du tror!",
+                "keywords": ["kö", "kötid", "köa", "väntetid", "vänta", "länge"]
+            },
+            {
+                "question": "Kan jag boka en visning?",
+                "answer": "Absolut! Ring 0793-006638 så bokar vi en tid som passar dig. Visningar sker vanligtvis vardagar kvällstid eller helger.",
+                "keywords": ["visning", "boka", "titta", "se", "kika"]
+            },
+            {
+                "question": "Hur lång tid tar det innan man får svar?",
+                "answer": "Vi svarar så snabbt vi kan. Oftast får du svar inom 24-48 timmar på vardagar. Akuta ärenden hanteras samma dag.",
+                "keywords": ["svar", "tid", "hur länge", "snabbt", "vänta"]
+            },
+
+            # ============================================
+            # AVTAL & REGLER
+            # ============================================
+            {
+                "question": "Hur lång är uppsägningstiden?",
+                "answer": "Uppsägningstiden varierar beroende på avtalstyp, vanligtvis 3 månader för bostadslägenheter. Kontrollera ditt avtal eller ring 0793-006638.",
+                "keywords": ["uppsägningstid", "säga upp", "avsluta", "följa", "3 månader"]
+            },
+            {
+                "question": "Kan jag säga upp mitt kontrakt i förtid?",
+                "answer": "Avtalet kan normalt inte sägas upp i förtid men du kan ansöka om att få lämna lägenheten tidigare med ny hyresgäst. Ring 0793-006638 för diskussion.",
+                "keywords": ["förtid", "tidigare", "flytta tidigare", "säga upp"]
+            },
+            {
+                "question": "Får man ha husdjur?",
+                "answer": "Regler för husdjur varierar mellan fastigheter. Vissa tillåter husdjur medans andra inte gör det. Ring 0793-006638 för att fråga om just din fastighet.",
+                "keywords": ["djur", "hund", "katt", "husdjur", "sällskapsdjur", "djurhållning"]
+            },
+            {
+                "question": "Får jag hyra ut i andra hand?",
+                "answer": "Andrahandsuthyrning kräver godkännande från bostadsrättsförening eller hyresvärd. Kontakta oss på 0793-006638 för ansökan och information om processen.",
+                "keywords": ["andrahand", "andra hand", "hyra ut", "andrahandsuthyrning"]
+            },
+            {
+                "question": "Kan jag byta lägenhet inom ert bestånd?",
+                "answer": "Byte av lägenhet kan vara möjligt beroende på vad som finns tillgängligt. Ring 0793-006638 och berätta vad du söker, så ser vi vad vi kan göra.",
+                "keywords": ["byta", "byter", "lägenhetsbyte", "byta lägenhet", "internbyte"]
+            },
+
+            # ============================================
+            # FELANMÄLAN
+            # ============================================
             {
                 "question": "Hur gör jag en felanmälan?",
                 "answer": "Felanmälan görs enklast via vår hemsida under 'Kontakta oss' eller genom att ringa oss på 0793-006638. För akuta ärenden utanför kontorstid, ring vår jour.",
                 "keywords": ["felanmälan", "fel", "reparation", "jour"]
             },
             {
-                "question": "Vilka områden verkar ni i?",
-                "answer": "Vi verkar främst i Johanneberg, Partille och Mölndal med omnejd.",
-                "keywords": ["område", "plats", "location", "var", "stad"]
+                "question": "Jag har problem med värmen, vad gör jag?",
+                "answer": "Kolla först att termostaten står på tillräckligt. Om elementet är kallt medan andra i lägenheten är varma kan det vara luft i systemet - försök lufta det. Hjälper ej? Ring 0793-006638.",
+                "keywords": ["värme", "element", "kallt", "termostat", "problem"]
             },
+            {
+                "question": "Min kran läcker, kan ni hjälpa mig?",
+                "answer": "Droppar det från en kran, försök täta med handduk. Är det en vattenläcka från rör, stäng av ventilen under diskhon och ring jour på 0793-006638.",
+                "keywords": ["kran", "läcker", "droppar", "vatten", "läcka"]
+            },
+            {
+                "question": "Det är akut – vem ringer jag utanför kontorstid?",
+                "answer": "För akuta ärenden dygnet runt, ring jour på 0793-006638. Vid fara för liv - ring 112 först.",
+                "keywords": ["akut", "jour", "natt", "helg", "kväll", "kontorstid", "utenför"]
+            },
+
+            # ============================================
+            # EDGE CASES & SPECIAL SITUATIONS
+            # ============================================
+            {
+                "question": "Jag är student och har låg inkomst, kan jag ändå hyra?",
+                "answer": "Vi tar individuella beslut baserat på helhetsbedömning. Kontakta oss på 0793-006638 så diskuterar vi dina möjligheter. Vi kan ibland acceptera borgensman vid lägre inkomst.",
+                "keywords": ["student", "låg inkomst", "pengar", "ekonomi", "borgensman", "råd"]
+            },
+            {
+                "question": "Jag vill ha en billig men fin lägenhet nära centrum, vad rekommenderar du?",
+                "answer": "Vi har olika lägenheter i Johanneberg, Partille och Mölndal. Vad som är 'billigt' varierar - ring 0793-006638 så berättar vi vad vi har som matchar din budget.",
+                "keywords": ["billig", "fin", "centrum", "nära", "rekommendation", "råd"]
+            },
+            {
+                "question": "Jag vet inte riktigt vad jag söker – kan du hjälpa mig?",
+                "answer": "Självklart! 🤔 Vi ställer några frågor för att hjälpa dig hitta rätt. Ring 0793-006638 så går vi igenom dina behov (storlek, område, budget).",
+                "keywords": ["vet inte", "osäker", "hjälp", "råd", "vad söker"]
+            },
+            {
+                "question": "Jag vill flytta nästa månad – vad finns tillgängligt snabbt?",
+                "answer": "Snabb inflytt möjlig beroende på vad vi har tillgängligt. Ring 0793-006638 så kollar vi vad som finns ledigt med kort varsel.",
+                "keywords": ["flytta", "snabbt", "nästa månad", "korta varsel", "fort"]
+            },
+            {
+                "question": "Har ni något större för en familj med hund?",
+                "answer": "Vi har lägenheter som passar familjer. Regler för husdjur varierar - ring 0793-006638 så hittar vi ett objekt som tillåter hund.",
+                "keywords": ["familj", "hund", "stor", "djur", "husdjur", "4:a", "5:a"]
+            },
+            {
+                "question": "Jag är en familj på fyra personer, behöver 3–4 rok i Partille, max 13 000 kr/mån – vad har ni?",
+                "answer": "Vi hjälper dig hitta en lägenhet som matchar dina behov. Ring 0793-006638 så diskuterar vi vad som finns tillgängligt i Partille. Pris och storlek avgörs individuellt.",
+                "keywords": ["familj", "fyra", "4 personer", "3 rok", "4 rok", "partille", "13000", "10000"]
+            },
+            {
+                "question": "Jag är redan hyresgäst – hur förlänger jag mitt avtal?",
+                "answer": "Hyresavtal löper oftast på tidsbestämd tid eller löpande. Kontakta oss på 0793-006638 så kollar vi ditt specifika avtal och villkor för förlängning.",
+                "keywords": ["hyresgäst", "redan", "förlänga", "avtal", "förlängning", "bocker"]
+            },
+            {
+                "question": "Jag driver eget företag och söker en lokal med bra skyltläge",
+                "answer": "Vi har kommersiella lokaler i olika områden. Ring 0793-006638 så berättar vi vad vi har som passar din verksamhet.",
+                "keywords": ["företag", "egenföretagare", "skyltläge", "lokal", "kommersiell", "butik"]
+            },
+
+            # ============================================
+            # GENERAL INFORMATION
+            # ============================================
             {
                 "question": "Hanterar ni bostadsrättsföreningar?",
                 "answer": "Ja, vi har lång erfarenhet av att förvalta bostadsrättsföreningar. Vi tar hand om allt från daglig drift till ekonomisk förvaltning.",
@@ -146,6 +370,11 @@ class SupportStarterBot:
                 "question": "Vad kostar er förvaltning?",
                 "answer": "Prissättning sker individuellt baserat på fastighetens storlek och omfattning av tjänster. Kontakta oss för en kostnadsfri offert.",
                 "keywords": ["pris", "kostnad", "betala", "offert"]
+            },
+            {
+                "question": "Hur gör jag en flyttanmälan?",
+                "answer": "Kontakta oss på 0793-006638 minst en månad innan flytt. För BRF-medlemmar: kontakta även föreningen för överlåtelsebeslut. Nycklar överlämnas på överenskommen tid.",
+                "keywords": ["flytt", "utflytt", "inflytt", "flyttanmälan", "nyckel"]
             },
 
             # Property Management - Technical
@@ -334,6 +563,64 @@ class SupportStarterBot:
             category="emergency",
             keywords=["akut", "urgens", "jour", "prioriter", "kritiskt"],
             priority=3
+        ))
+
+        # Housing & Rental comprehensive knowledge
+        rag.add_knowledge(KnowledgeChunk(
+            id="housing_availability",
+            content="LEDIGA LÄGENHETER & LOKALER: Vallhamragruppen förvaltar fastigheter i Johanneberg, Partille och Mölndal. För aktuellt utbud av lediga lägenheter och lokaler - kontakta oss på 0793-006638 eller info@vallhamragruppen.se. Vi hjälper dig hitta rätt objekt baserat på dina behov (storlek, läge, budget). Hyror varierar beroende på standard och läge. Många lägenheter har balkong/uteplats. Parkering kan finnas tillgängligt.",
+            category="housing",
+            keywords=["ledig", "lediga", "lägenhet", "bostad", "lokal", "hyra", "partille", "johanneberg", "mölndal", "objekt", "utbud"],
+            priority=4
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="rental_application_process",
+            content="ANSÖKAN OM LÄGENHET: Kontakta oss på 0793-006638 eller info@vallhamragruppen.se. Vi ställer frågor om dina behov (storlek, område, budget). Vid intresse bokar vi visning. Dokument som kan behövas: ID-handling, inkomstbevis/anställningsintyg, referenser. Vi gör en kreditprövning. Svarstid: 24-48 timmar vardagar. Akuta ärenden samma dag.",
+            category="housing",
+            keywords=["ansöka", "ansökan", "söka", "visning", "dokument", "id", "inkomstbevis", "kreditupplysning", "kötid"],
+            priority=4
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="rental_terms_rules",
+            content="HYRESVILLKOR: Hyran inkluderar oftast värme och vatten. Ibland bredband och TV. Betalas månadsvis via autogiro eller bankgiro. Uppsägningstid vanligtvis 3 månader. Andrahandsuthyrning kräver godkännande. Husdjur regler varierar mellan fastigheter - fråga vid ansökan. För frågor om specifik fastighet: ring 0793-006638.",
+            category="housing",
+            keywords=["hyra", "hyra", "betalning", "autogiro", "uppsägningstid", "uppsägning", "andrahand", "djur", "husdjur", "villkor", "regler"],
+            priority=4
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="commercial_properties",
+            content="KOMMERSIELLA LOKALER: Vi förvaltar kontor, butiker, lager och industri. Hyror sätts individuellt baserat på läge, standard och yta. Vissa hyror inkluderar driftkostnader (el, värme, vatten). Kontakta 0793-006638 för offert och tillgänglighet. Lokalvård kan inkludera städning, fönsterputs, toalettstädning, pappershantering och grönyteskötsel.",
+            category="commercial",
+            keywords=["kommersiell", "lokal", "kontor", "butik", "lager", "industri", "företag", "hyra", "kvm", "lokalvård", "driftkostnad"],
+            priority=3
+        ))
+
+        # FAQ for edge cases
+        rag.add_knowledge(KnowledgeChunk(
+            id="faq_student_low_income",
+            content="STUDENTER & LÅG INKOMST: Vi tar individuella beslut baserat på helhetsbedömning. Kontakta oss på 0793-006638 så diskuterar vi dina möjligheter. Vi kan ibland acceptera borgensman vid lägre inkomst.",
+            category="housing",
+            keywords=["student", "låg inkomst", "pengar", "ekonomi", "borgensman", "råd", "hyra ändå", "kan jag ändå"],
+            priority=5  # Highest priority for student questions
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="faq_family_pets",
+            content="FAMILJER & HUSDJUR: Vi har lägenheter som passar olika familjekonstellurationer. Kontakta 0793-006638 för att höra vad som finns tillgängligt. Regler för husdjur varierar mellan fastigheter - vissa tillåter hund/katt, andra inte. Vi guidar dig till rätt objekt.",
+            category="housing",
+            keywords=["familj", "barn", "hund", "katt", "djur", "husdjur", "stor", "4:a", "5:a", "fyra personer"],
+            priority=5  # High priority for family questions
+        ))
+
+        rag.add_knowledge(KnowledgeChunk(
+            id="faq_existing_tenant",
+            content="EXISTERANDE HYRESGÄSTER: För förlängning av avtal eller frågor om ditt nuvarande boende - ring 0793-006638. Vi hjälper dig med förlängning, ändringar eller byte av lägenhet.",
+            category="housing",
+            keywords=["hyresgäst", "redan", "förlänga", "avtal", "förlängning", "bocker", "nuvarande"],
+            priority=5  # High priority for existing tenants
         ))
 
         return rag
@@ -594,8 +881,8 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             try:
                 response = self.client.messages.create(
                     model="claude-3-5-sonnet-20241022",
-                    max_tokens=500,
-                    temperature=0.4,
+                    max_tokens=800,  # Increased for more detailed answers
+                    temperature=0.5,  # Slightly higher for more natural responses
                     system=prompt,
                     messages=[{"role": "user", "content": message}]
                 )
@@ -604,36 +891,54 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
                 print(f"API Error: {e}")
                 # Fall back to simple response
 
-        # Fallback: Simple rule-based response
-        return self._get_fallback_response(router_result, session)
+        # Fallback: Use RAG + rule-based response when API unavailable
+        return self._get_fallback_response(message, router_result, session)
 
-    def _get_fallback_response(self, router_result, session) -> str:
-        """Get fallback response when API is unavailable"""
+    def _get_fallback_response(self, message: str, router_result, session) -> str:
+        """Get fallback response when API is unavailable - uses RAG for smart answers"""
         intent = router_result.intent.value
         sentiment = router_result.sentiment.value
 
-        # Check for direct FAQ match
+        # First, try to get relevant FAQ from RAG
+        rag_results = self.rag.retrieve(message, top_k=3)
+        if rag_results.chunks and len(rag_results.chunks) > 0:
+            # We found relevant knowledge - return the top result
+            top_chunk = rag_results.chunks[0]
+            response = top_chunk.content
+            # Clean up FAQ format (remove "Q: ... A:" prefix)
+            if "\nA: " in response:
+                response = response.split("\nA: ")[1]
+            # Remove any remaining "Q:" prefix
+            if response.startswith("Q: "):
+                response = response.split("A: ")[-1] if "A: " in response else response[3:]
+            # Add a friendly closing if the response is short
+            if len(response) < 200:
+                response += "\n\nRing 0793-006638 för mer information eller visning."
+            return response
+
+        # Check for direct FAQ match using trigger phrases
         from rag import FAQManager
         faq_manager = FAQManager(self.rag)
-        faq_answer = faq_manager.get_answer(router_result.trigger_phrases[0] if router_result.trigger_phrases else "")
-        if faq_answer:
-            return faq_answer
+        if router_result.trigger_phrases:
+            faq_answer = faq_manager.get_answer(router_result.trigger_phrases[0])
+            if faq_answer:
+                return faq_answer
 
-        # Rule-based responses
+        # Rule-based responses for common intents
         if "pricing" in intent or "pris" in intent:
             return self.config.pricing
 
         if "booking" in intent or "boka" in intent:
-            return f"Vill du boka ett möte eller en visning? Du kan nå oss på {self.config.phone} eller via vår hemsida."
+            return f"Vad roligt att du vill boka! Ring {self.config.phone} så hittar vi en tid som passar."
 
         if sentiment == "angry":
-            return "Jag förstår att detta är viktigt för dig. Låt mig koppla dig till en kollega som kan hjälpa dig direkt."
+            return "Jag förstår att detta är viktigt för dig. Ring 0793-006638 så hjälper en kollega dig direkt."
 
         if sentiment == "frustrated":
-            return "Jag ber om ursäkt för besväret. Låt mig hjälpa dig vidare. Kan du beskriva vad du behöver hjälp med?"
+            return "Jag ber om ursäkt för besväret. Ring 0793-006638 så hjälper vi dig vidare."
 
-        # Default response
-        return f"Vad gäller? Ring {self.config.phone} eller {self.config.contact_email} så hjälper vi dig."
+        # Default response - friendly and directing to contact
+        return f"Vad gäller? 🤔 Ring {self.config.phone} eller {self.config.contact_email} så hjälper vi dig direkt!"
 
     def check_proactive_message(self, session_id: str) -> Optional[str]:
         """Check if should send proactive message"""

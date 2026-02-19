@@ -207,33 +207,33 @@ class FaultReportSystem:
         if urgency == UrgencyLevel.CRITICAL:
             if category == FaultCategory.WATER:
                 return (
-                    "Vattenläcka - stäng av vattnet under diskhon om möjligt. "
+                    "Vattenläcka! 💧 Stäng av vattnet under diskhon om möjligt. "
                     "Ring jour på 0793-006638 direkt. Var i lägenheten läcker det?"
                 )
             elif category == FaultCategory.SECURITY:
                 return (
-                    "Utelåst? Ring jour på 0793-006638 nu. Vilken adress?"
+                    "Utelåst? 🔑 Ring jour på 0793-006638 nu. Vilken adress?"
                 )
             else:
                 return (
-                    "Akut ärende - ring jour på 0793-006638 direkt. Vad har hänt?"
+                    "Akut ärende! 🚨 Ring jour på 0793-006638 direkt. Vad har hänt?"
                 )
 
         # HIGH - Important but not emergency
         elif urgency == UrgencyLevel.HIGH:
             if category == FaultCategory.WATER:
                 return (
-                    "Inget vatten. Gäller det hela fastigheten eller bara din lägenhet? "
+                    "Inget vatten. 💧 Gäller det hela fastigheten eller bara din lägenhet? "
                     "Kolla med grannen. Ring 0793-006638 om det inte återkommer."
                 )
             elif category == FaultCategory.HEATING:
                 return (
-                    "Ingen värme. Kollat termostaten på elementen? Gäller ett element eller hela lägenheten? "
+                    "Ingen värme. 🌡️ Kollat termostaten på elementen? Gäller ett element eller hela lägenheten? "
                     "Ring 0793-006638 om det inte hjälper."
                 )
             elif category == FaultCategory.ELECTRICAL:
                 return (
-                    "Strömproblem. Kolla säkringsskärmet i trapphus först. Gäller det hela lägenheten? "
+                    "Strömproblem. ⚡ Kolla säkringsskärmet i trapphus först. Gäller det hela lägenheten? "
                     "Ring 0793-006638."
                 )
             else:
@@ -245,12 +245,12 @@ class FaultReportSystem:
         elif urgency == UrgencyLevel.MEDIUM:
             if category == FaultCategory.WATER:
                 return (
-                    "Vattenproblem. Läcka eller droppande kran? Var i lägenheten? "
+                    "Vattenproblem. 💧 Läcka eller droppande kran? Var i lägenheten? "
                     "Är det farligt för el eller golv?"
                 )
             elif category == FaultCategory.APPLIANCE:
                 return (
-                    "Vitvaror. Köpt av dig eller ingår i fastigheten? Ring 0793-006638."
+                    "Vitvaror. 🏠 Köpt av dig eller ingår i fastigheten? Ring 0793-006638."
                 )
             else:
                 return (
@@ -260,7 +260,7 @@ class FaultReportSystem:
         # LOW - General inquiry
         else:
             return (
-                "Vad gäller? Felanmälan når du på 0793-006638. Berätta vad som hänt."
+                "Vad gäller? 🤔 Felanmälan når du på 0793-006638. Berätta vad som hänt."
             )
 
     def collect_fault_report(self, message: str, session_data: Dict) -> Dict:
