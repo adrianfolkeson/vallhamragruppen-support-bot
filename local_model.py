@@ -20,12 +20,12 @@ class LocalModel:
         self.patterns = {
             # Contact & Location
             r"\b(kontakt|telefon|ring|nummer|phone|call)\b": {
-                "response": f"Du kan nå {company_name} på telefon 0793-006638 eller via email info@vallhamragruppen.se. Vi finns i Göteborg, Mölndal och Partille.",
+                "response": f"Du kan nå {company_name} på telefon 0793-006638 eller via email info@vallhamragruppen.se. Vi finns i Johanneberg, Partille och Mölndal.",
                 "intent": "contact",
                 "lead_score": 1
             },
             r"\b(adress|plats|var|var finns ni|hitta|h whereabouts)\b": {
-                "response": f"{company_name} verkar i Göteborg, Mölndal och Partille med omnejd. Kontorz: info@vallhamragruppen.se, Tel: 0793-006638.",
+                "response": f"{company_name} verkar i Johanneberg, Partille och Mölndal med omnejd. Kontakt: info@vallhamragruppen.se, Tel: 0793-006638.",
                 "intent": "location",
                 "lead_score": 1
             },

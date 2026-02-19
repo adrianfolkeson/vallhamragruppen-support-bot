@@ -30,7 +30,7 @@ class BotConfig:
     # Company info
     COMPANY_NAME: str = "Vallhamragruppen AB"
     industry: str = "Fastighetsförvaltning"
-    locations: str = "Göteborg, Mölndal, Partille"
+    locations: str = "Johanneberg, Partille, Mölndal"
     phone: str = "0793-006638"
     contact_email: str = "info@vallhamragruppen.se"
     website: str = "https://vallhamragruppen.se"
@@ -57,7 +57,7 @@ class BotConfig:
        genom att ringa oss på 0793-006638.
 
     Q: Vilka områden verkar ni i?
-    A: Vi verkar främst i Göteborg, Mölndal och Partille.
+    A: Vi verkar främst i Johanneberg, Partille och Mölndal.
 
     Q: Hanterar ni bostadsrättsföreningar?
     A: Ja, vi har lång erfarenhet av att förvalta bostadsrättsföreningar.
@@ -128,7 +128,7 @@ class SupportStarterBot:
             },
             {
                 "question": "Vilka områden verkar ni i?",
-                "answer": "Vi verkar främst i Göteborg, Mölndal och Partille med omnejd.",
+                "answer": "Vi verkar främst i Johanneberg, Partille och Mölndal med omnejd.",
                 "keywords": ["område", "plats", "location", "var", "stad"]
             },
             {
