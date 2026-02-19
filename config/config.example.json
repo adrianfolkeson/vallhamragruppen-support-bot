@@ -1,0 +1,79 @@
+{
+  "_comment": "This is a template configuration file. Copy this to config.json and fill in your values.",
+
+  "COMPANY_NAME": "Företagets Namn AB",
+  "industry": "Din bransch",
+  "locations": "Område 1, Område 2, Område 3",
+  "phone": "07X-XXX XX XX",
+  "contact_email": "info@foretag.se",
+  "website": "https://foretag.se",
+  "business_hours": "Mån-Fre 08:00-17:00",
+  "response_time": "24 timmar",
+
+  "services": "Beskriv dina tjänster här...",
+
+  "pricing": "Prissättning sker individuellt. Kontakta oss för offert.",
+
+  "faq_list": "Q: Vanlig fråga?\\nA: Svar här...\\n\\nQ: En annan fråga?\\nA: Svar...",
+
+  "refund_policy": "Din returpolicy",
+  "cancellation_policy": "Din avbokningspolicy",
+
+  "tone_style": "Professionell, vänlig",
+  "booking_link": "https://foretag.se/boka",
+  "contact_form": "https://foretag.se/kontakt",
+
+  "anthropic_api_key": "",
+  "max_requests_per_minute": 60,
+
+  "_comment_fault_responses": "Use {phone} as placeholder for phone number",
+  "fault_water_critical": "Vattenläcka! 💧 Stäng av vattnet. Ring jour på {phone} direkt.",
+  "fault_lockout": "Utelåst? 🔑 Ring jour på {phone} nu. Vilken adress?",
+  "fault_general_critical": "Akut ärende! 🚨 Ring jour på {phone} direkt. Vad har hänt?",
+  "fault_water_high": "Inget vatten. Ring {phone} om det inte återkommer.",
+  "fault_heating_high": "Ingen värme. Ring {phone} om det inte hjälper.",
+  "fault_electric_high": "Strömproblem. Ring {phone}.",
+  "fault_general_high": "Viktigt ärende. Ring {phone}.",
+  "fault_water_medium": "Vattenproblem. Var i lägenheten?",
+  "fault_appliance_medium": "Vitvaror. Ring {phone}.",
+  "fault_general_medium": "Beskriv problemet. Var i fastigheten?",
+  "fault_general_low": "Vad gäller? Ring {phone}.",
+
+  "_comment_local_model": "Use {company_name}, {phone}, {email}, {locations}, {business_hours} as placeholders",
+  "greeting_response": "Hej! 👋 {company_name} här. Hur kan jag hjälpa?",
+  "contact_response": "Ring {phone} eller mejla {email}. Vi finns i {locations}.",
+  "hours_response": "{business_hours}. Akuta ärenden: ring {phone}.",
+  "emergency_critical_response": "Akut läge! 🚨 Ring 112 först. Ring sedan {phone}.",
+  "lockout_emergency_response": "Utelåst? 🔑 Ring {phone} nu.",
+  "how_to_report_response": "Felanmälan: ring {phone}.",
+
+  "_comment_faq_data": "FAQ entries - use {phone}, {email}, {locations} as placeholders",
+  "faq_data": [
+    {
+      "question": "Hur gör jag en felanmälan?",
+      "answer": "Ring {phone} eller använd kontaktformuläret på hemsidan.",
+      "keywords": ["felanmälan", "fel", "reparation"]
+    },
+    {
+      "question": "Vilka områden verkar ni i?",
+      "answer": "Vi verkar i {locations}.",
+      "keywords": ["område", "var", "plats"]
+    },
+    {
+      "question": "Hur snabbt får man svar?",
+      "answer": "Vi svarar inom 24 timmar på vardagar.",
+      "keywords": ["snabbt", "tid", "svar"]
+    }
+  ],
+
+  "_comment_knowledge": "Knowledge chunks for RAG system - use placeholders",
+  "knowledge_chunks": [
+    {
+      "id": "company_info",
+      "content": "COMPANY: {COMPANY_NAME}. Phone: {phone}. Email: {email}. Website: {website}. Hours: {business_hours}. Locations: {locations}.",
+      "category": "contact",
+      "keywords": ["kontakt", "ring", "mejl", "telefon"],
+      "priority": 3
+    }
+  ]
+}

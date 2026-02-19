@@ -5,6 +5,11 @@
 # Google credentials (sensitive!)
 google-credentials.json
 
+# Config files (customer-specific data)
+config/config.json
+config/*.json
+!config/config.example.json
+
 # Chat logs (customer data)
 chat_logs/
 

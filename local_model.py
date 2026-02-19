@@ -17,8 +17,24 @@ class LocalModel:
     Rule-based model for handling ONLY very simple, explicit queries.
     All complex questions should fall through to RAG/LLM.
     """
-    def __init__(self, company_name: str = "Vallhamragruppen"):
-        self.company_name = company_name
+    def __init__(self, company_name: str = None, config=None):
+        if config:
+            self.config = config
+            self.company_name = config.COMPANY_NAME
+        else:
+            from config_loader import load_config_or_default
+            self.config = load_config_or_default()
+            self.company_name = company_name or self.config.COMPANY_NAME
+
+        # Helper function to replace placeholders in responses
+        def format_response(template):
+            return template.format(
+                company_name=self.config.COMPANY_NAME,
+                phone=self.config.phone,
+                email=self.config.contact_email,
+                locations=self.config.locations,
+                business_hours=self.config.business_hours
+            )
 
         # ONLY very explicit, simple patterns that have clear answers
         self.patterns = {
@@ -26,7 +42,7 @@ class LocalModel:
             # GREETINGS & SOCIAL - Simple responses
             # ============================================
             r"^(hej|tjena|hallå|god dag|hello|hi|hey|godmorgon|godkväll)[\s!?]*$": {
-                "response": f"Hej! 👋 {company_name} här. Jag hjälper med frågor om fastigheter, felanmälan och förvaltning. Vad kan jag hjälpa med?",
+                "response": format_response(self.config.greeting_response),
                 "intent": "greeting",
                 "lead_score": 1,
                 "confidence": 0.9
@@ -48,13 +64,13 @@ class LocalModel:
             # CONTACT - Direct contact requests only
             # ============================================
             r"^(?!(.){30,})(kontakt|telefon|nummer|ring|mejl|e-post|email|adress)[\s ?!]*$": {
-                "response": "Ring oss på 0793-006638 eller mejla info@vallhamragruppen.se. Vi finns i Johanneberg, Partille och Mölndal. 📍",
+                "response": format_response(self.config.contact_response),
                 "intent": "contact",
                 "lead_score": 1,
                 "confidence": 0.85
             },
             r"^(öppettider|när är ni öppna|öppet)[\s ?!]*$": {
-                "response": "Mån-Fre 08:00-17:00. Akuta ärenden dygnet runt: ring jour på 0793-006638. ⏰",
+                "response": format_response(self.config.hours_response),
                 "intent": "hours",
                 "lead_score": 1,
                 "confidence": 0.9
@@ -64,13 +80,13 @@ class LocalModel:
             # CRITICAL EMERGENCIES - These must be caught immediately
             # ============================================
             r"(akut|brinner|brand|gasläcka|översvämning|vattenläcka.*(forsar|stort|akut)|inbrott.*pågående|skadegörelse.*pågående)": {
-                "response": "Akut läge! 🚨 Ring 112 först vid fara för liv. Ring sedan jour på 0793-006638. Vad har hänt?",
+                "response": format_response(self.config.emergency_critical_response),
                 "intent": "emergency_critical",
                 "lead_score": 5,
                 "confidence": 0.95
             },
             r"(utelåst|låst.*ute|kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel).{0,30}!": {
-                "response": "Utelåst? 🔑 Ring jour 0793-006638 nu. Vilken adress?",
+                "response": format_response(self.config.lockout_emergency_response),
                 "intent": "lockout_emergency",
                 "lead_score": 4,
                 "confidence": 0.9
@@ -80,7 +96,7 @@ class LocalModel:
             # SIMPLE FAULT REPORT - Just the reporting mechanism
             # ============================================
             r"^hur (gör|fungerar) (jag|man) en felanmälan[\s ?!]*$": {
-                "response": "Felanmälan: ring 0793-006638 eller använd formulär på hemsidan. 🛠️ För akuta ärenden, ring jour.",
+                "response": format_response(self.config.how_to_report_response),
                 "intent": "how_to_report",
                 "lead_score": 2,
                 "confidence": 0.9

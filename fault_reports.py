@@ -57,7 +57,32 @@ class FaultReportSystem:
     """
     System for collecting and managing fault reports
     """
-    def __init__(self):
+    def __init__(self, config=None):
+        if config:
+            self.config = config
+        else:
+            from config_loader import load_config_or_default
+            self.config = load_config_or_default()
+
+        # Helper function to format responses
+        def format_response(template):
+            return template.format(phone=self.config.phone)
+
+        # Store formatted responses
+        self.responses = {
+            "fault_water_critical": format_response(self.config.fault_water_critical),
+            "fault_lockout": format_response(self.config.fault_lockout),
+            "fault_general_critical": format_response(self.config.fault_general_critical),
+            "fault_water_high": format_response(self.config.fault_water_high),
+            "fault_heating_high": format_response(self.config.fault_heating_high),
+            "fault_electric_high": format_response(self.config.fault_electric_high),
+            "fault_general_high": format_response(self.config.fault_general_high),
+            "fault_water_medium": format_response(self.config.fault_water_medium),
+            "fault_appliance_medium": format_response(self.config.fault_appliance_medium),
+            "fault_general_medium": format_response(self.config.fault_general_medium),
+            "fault_general_low": format_response(self.config.fault_general_low),
+        }
+
         # Urgency detection patterns
         self.urgency_patterns = {
             UrgencyLevel.CRITICAL: [
@@ -206,62 +231,35 @@ class FaultReportSystem:
         # CRITICAL - Immediate action needed
         if urgency == UrgencyLevel.CRITICAL:
             if category == FaultCategory.WATER:
-                return (
-                    "Vattenläcka! 💧 Stäng av vattnet under diskhon om möjligt. "
-                    "Ring jour på 0793-006638 direkt. Var i lägenheten läcker det?"
-                )
+                return self.responses["fault_water_critical"]
             elif category == FaultCategory.SECURITY:
-                return (
-                    "Utelåst? 🔑 Ring jour på 0793-006638 nu. Vilken adress?"
-                )
+                return self.responses["fault_lockout"]
             else:
-                return (
-                    "Akut ärende! 🚨 Ring jour på 0793-006638 direkt. Vad har hänt?"
-                )
+                return self.responses["fault_general_critical"]
 
         # HIGH - Important but not emergency
         elif urgency == UrgencyLevel.HIGH:
             if category == FaultCategory.WATER:
-                return (
-                    "Inget vatten. 💧 Gäller det hela fastigheten eller bara din lägenhet? "
-                    "Kolla med grannen. Ring 0793-006638 om det inte återkommer."
-                )
+                return self.responses["fault_water_high"]
             elif category == FaultCategory.HEATING:
-                return (
-                    "Ingen värme. 🌡️ Kollat termostaten på elementen? Gäller ett element eller hela lägenheten? "
-                    "Ring 0793-006638 om det inte hjälper."
-                )
+                return self.responses["fault_heating_high"]
             elif category == FaultCategory.ELECTRICAL:
-                return (
-                    "Strömproblem. ⚡ Kolla säkringsskärmet i trapphus först. Gäller det hela lägenheten? "
-                    "Ring 0793-006638."
-                )
+                return self.responses["fault_electric_high"]
             else:
-                return (
-                    "Viktigt ärende. Ring 0793-006638 och berätta vad som hänt."
-                )
+                return self.responses["fault_general_high"]
 
         # MEDIUM - Needs more info to determine urgency
         elif urgency == UrgencyLevel.MEDIUM:
             if category == FaultCategory.WATER:
-                return (
-                    "Vattenproblem. 💧 Läcka eller droppande kran? Var i lägenheten? "
-                    "Är det farligt för el eller golv?"
-                )
+                return self.responses["fault_water_medium"]
             elif category == FaultCategory.APPLIANCE:
-                return (
-                    "Vitvaror. 🏠 Köpt av dig eller ingår i fastigheten? Ring 0793-006638."
-                )
+                return self.responses["fault_appliance_medium"]
             else:
-                return (
-                    "Beskriv problemet. Var i fastigheten? Är det akut eller kan vänta?"
-                )
+                return self.responses["fault_general_medium"]
 
         # LOW - General inquiry
         else:
-            return (
-                "Vad gäller? 🤔 Felanmälan når du på 0793-006638. Berätta vad som hänt."
-            )
+            return self.responses["fault_general_low"]
 
     def collect_fault_report(self, message: str, session_data: Dict) -> Dict:
         """
