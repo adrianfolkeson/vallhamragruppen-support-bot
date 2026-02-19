@@ -23,9 +23,9 @@ class FaultCategory(Enum):
     """Categories of faults"""
     WATER = "water"  # Vattenläcka, avlopp
     ELECTRICAL = "electrical"  # Elektriska problem
-    HEATING = "heating"  "Värme, ventilation
+    HEATING = "heating"  # Värme, ventilation
     SECURITY = "security"  # Lås, inbrott
-    STRUCTURAL = "structural"  # Bygnadsskador
+    STRUCTURAL = "structural"  # Byggnadsskador
     APPLIANCE = "appliance"  # Vitvaror, utrustning
     OTHER = "other"
 
@@ -108,21 +108,69 @@ class FaultReportSystem:
         self.required_fields = ["description", "location"]
 
     def detect_urgency(self, text: str) -> UrgencyLevel:
-        """Detect urgency level from text"""
+        """
+        Detect urgency level from text with smart classification
+
+        CRITICAL: Immediate danger - flood, fire, gas leak, lockout, burst pipe
+        HIGH: Important but not dangerous - no water, no heat, broken lock
+        MEDIUM: Annoying but manageable - dripping tap, noisy appliance
+        LOW: Minor issues - cosmetic damage, general questions
+        """
         text_lower = text.lower()
 
-        # Check critical first
-        for pattern in self.urgency_patterns[UrgencyLevel.CRITICAL]:
+        # CRITICAL - Life safety or property damage
+        critical_patterns = [
+            # Water disasters
+            r"\b(översvämning|vattenläcka.*(akut|stort|forsar|strömmar)|brustet.*rör|vatten.*(står|forsar))\b",
+            r"\b(flood|burst.*pipe|water.*everywhere|emergency)\b",
+            # Fire/gas
+            r"\b(brinner|brand|gasläcka|gas.*luktar|eld|rök|luktar.*gas)\b",
+            r"\b(fire|smell.*gas|smoke|burning)\b",
+            # Lockout - person locked out is critical
+            r"\b(låst.*ute|utelåst|kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel|låset.*går.*inte)\b.*!(?:!|!)",
+            r"\b(locked.*out|locked.*out.*my.*key|cannot.*enter|can.*t.*get.*in)\b",
+            # Inbrott
+            r"\b(inbrott|skadegörelse|krossat|försöker.*ta.*sig)\b",
+            r"\b(break[- ]?in|burglary|vandalism)\b",
+            # Explicit urgency markers with exclamation
+            r"\b(akut|kritiskt|oj|hjälp|nödan|tvingas)\b!+"
+        ]
+
+        # HIGH - Important issues affecting comfort/safety but not immediate danger
+        high_patterns = [
+            # No water or heat
+            r"\b(ingen.*varmvatten|inget.*vatten|vatten.*saknas|kranen.*ger.*inget)\b",
+            r"\b(no.*water|no.*hot.*water|water.*out)\b",
+            r"\b(ingen.*värme|elementen.*kalla|kyla.*inomhus|fryser.*inomhus|termostat.*inte|värme.*ej)\b",
+            r"\b(no.*heating|freezing.*inside|radiator.*cold|can.*t.*get.*warm)\b",
+            # Security issues (not lockout)
+            r"\b(lås.*gått.*sönder|nyckel.*fast|dörr.*går.*inte.*öppna)\b",
+            r"\b(broken.*lock|key.*stuck|door.*won.*t.*open)\b",
+            # No electricity
+            r"\b(ingen.*ström|strömavbrott|elektricitet.*borta|själva.*fastigheten.*ström)\b",
+            r"\b(power.*out|no.*electricity|blackout)\b"
+        ]
+
+        # MEDIUM - Annoying issues, dripping, minor leaks
+        medium_patterns = [
+            r"\b(droppar|läcker|kran|droppande|läcker|lite.*vatten)\b",
+            r"\b(leaking|dripping|drip|slow.*leak)\b",
+            r"\b(låter|buller|konstig.*ljud|problem|fungerar.*dåligt)\b",
+            r"\b(noisy|making.*sound|not.*working.*properly)\b"
+        ]
+
+        # Check critical first (most specific patterns first)
+        for pattern in critical_patterns:
             if re.search(pattern, text_lower):
                 return UrgencyLevel.CRITICAL
 
         # Then high
-        for pattern in self.urgency_patterns[UrgencyLevel.HIGH]:
+        for pattern in high_patterns:
             if re.search(pattern, text_lower):
                 return UrgencyLevel.HIGH
 
         # Then medium
-        for pattern in self.urgency_patterns[UrgencyLevel.MEDIUM]:
+        for pattern in medium_patterns:
             if re.search(pattern, text_lower):
                 return UrgencyLevel.MEDIUM
 
@@ -150,28 +198,76 @@ class FaultReportSystem:
         """Determine if fault should be escalated immediately"""
         return urgency in [UrgencyLevel.CRITICAL, UrgencyLevel.HIGH]
 
-    def get_response_for_urgency(self, urgency: UrgencyLevel) -> str:
-        """Get appropriate response based on urgency"""
-        responses = {
-            UrgencyLevel.CRITICAL: (
-                "Jag förstår att detta är akut. Jag eskalerar detta omedelbart "
-                "till vår jour. För snabbast hjälp, ring oss direkt på 0793-006638."
-            ),
-            UrgencyLevel.HIGH: (
-                "Jag förstår att detta är viktigt. Jag skickar detta prioriterat "
-                "till vår tekniska team. Du får svar inom 2 timmar. "
-                "För omedelbar hjälp, ring 0793-006638."
-            ),
-            UrgencyLevel.MEDIUM: (
-                "Tack för din felanmälan. Vi har registrerat detta och du får "
-                "bekräftelse via email. Vi återkommer inom 24 timmar."
-            ),
-            UrgencyLevel.LOW: (
-                "Tack för din felanmälan. Vi har registrerat detta och "
-                "återkommer så snart vi kan."
+    def get_response_for_urgency(self, urgency: UrgencyLevel, category: FaultCategory, description: str) -> str:
+        """
+        Get appropriate response based on urgency and category
+        This is the "logical brain" that asks clarifying questions
+        """
+        # CRITICAL - Immediate action needed
+        if urgency == UrgencyLevel.CRITICAL:
+            if category == FaultCategory.WATER:
+                return (
+                    "Jag förstår att du har en allvarlig vattenläcka. "
+                    "Stäng av vattnet om du kan (kranen under diskhon). "
+                    "Ring omedelbart vår jour på 0793-006638. "
+                    "Var finns läckan? (Kök, badrum, tvättstuga?)"
+                )
+            elif category == FaultCategory.SECURITY:
+                return (
+                    "Jag förstår att du har problem med låsning. "
+                    "Ring oss direkt på 0793-006638 för omedelbar hjälp. "
+                    "Vilken dörr gäller det och var är du nu?"
+                )
+            else:
+                return (
+                    "Jag förstår att detta är akut. Ring omedelbart vår jour på 0793-006638. "
+                    "Kan du beskriva kort vad som har hänt?"
+                )
+
+        # HIGH - Important but not emergency
+        elif urgency == UrgencyLevel.HIGH:
+            if category == FaultCategory.WATER:
+                return (
+                    "Jag förstår att ni saknar vatten. "
+                    "Gäller det hela fastigheten eller bara din lägenhet? "
+                    "Ring oss på 0793-006638 om det behövs akut."
+                )
+            elif category == FaultCategory.HEATING:
+                return (
+                    "Jag förstår att det är kallt. "
+                    "Har du kontrollerat termostaten på elementen? "
+                    "Gäller det ett specifikt element eller hela lägenheten?"
+                )
+            elif category == FaultCategory.ELECTRICAL:
+                return (
+                    "Strömproblem noterat. Gäller det en specifik krets eller hela lägenheten? "
+                    "Har du kollat säkringsskärmet i trapphuset?"
+                )
+            else:
+                return (
+                    "Jag förstår att detta är viktigt. Berätta lite mer så jag kan hjälpa dig på bästa sätt."
+                )
+
+        # MEDIUM - Needs more info to determine urgency
+        elif urgency == UrgencyLevel.MEDIUM:
+            if category == FaultCategory.WATER:
+                return (
+                    "Vattenproblem noterat. För att hjälpa dig på bästa sätt: "
+                    "är det en vattenläcka eller droppar det från en kran? "
+                    "Var i lägenheten är problemet?"
+                )
+            else:
+                return (
+                    "Tack för din felanmälan. Kan du beskriva lite mer vad som hänt "
+                    "och var i fastigheten problemet finns?"
+                )
+
+        # LOW - General inquiry
+        else:
+            return (
+                "Vad kan jag hjälpa dig med? "
+                "Jag kan hjälpa till med felanmälan, frågor om våra tjänster, eller bokning."
             )
-        }
-        return responses.get(urgency, responses[UrgencyLevel.LOW])
 
     def collect_fault_report(self, message: str, session_data: Dict) -> Dict:
         """
@@ -183,7 +279,8 @@ class FaultReportSystem:
         urgency = self.detect_urgency(message)
         category = self.detect_category(message)
 
-        response = self.get_response_for_urgency(urgency)
+        # Get the smart response based on urgency and category
+        response = self.get_response_for_urgency(urgency, category, message)
 
         # Get reporter info from session if available
         reporter_name = session_data.get("customer_name")

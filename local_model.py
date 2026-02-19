@@ -46,6 +46,51 @@ class LocalModel:
                 "intent": "technical_issue",
                 "lead_score": 2
             },
+
+            # URGENT - Water issues - distinguish between critical flood and dripping
+            r"\b(översvämning|vattenläcka.*(akut|stort|forsar)|brustet.*rör|står.*vatten|forsar.*vatten|emergency|flood)\b": {
+                "response": "Jag förstår att du har en allvarlig vattenläcka! Stäng av vattnet om du kan (kranen under diskhon). Ring omedelbart vår jour på 0793-006638. Var finns läckan?",
+                "intent": "water_critical",
+                "lead_score": 2
+            },
+            r"\b(droppar|läcker|kran|diskmaskin|tvättmaskin|avlopp|vatten)\b": {
+                "response": "Jag förstår att du har problem med vatten. För att hjälpa dig: är det en vattenläcka eller droppar det från en kran/apparat? Var i lägenheten är problemet?",
+                "intent": "water_question",
+                "lead_score": 2
+            },
+
+            # URGENT - Lost keys / Lockouts (CRITICAL - people locked out)
+            r"\b(tappat.*nyckel|nyckel.*borta|glömde.*nyckel|utelåst|låst.*ute|kommer.*inte.*in|kan.*ej.*komma|låset.*går.*inte)\b": {
+                "response": "Jag förstår att du har problem med nyckeln/låset. Är du utelåst just nu? Ring oss direkt på 0793-006638 för omedelbar hjälp. Vilken dörr gäller det?",
+                "intent": "lockout_critical",
+                "lead_score": 2
+            },
+            r"\b(nyckel|lås|dörr|låset)\b": {
+                "response": "Jag hörde att du nämnde nyckel eller lås. Vad är problemet - har du tappat nyckeln, fungerar inte låset, eller är du utelåst?",
+                "intent": "lock_question",
+                "lead_score": 2
+            },
+
+            # URGENT - No heat (critical but not emergency)
+            r"\b(ingen värme|kallt|fryser|elementen|element fungerar|dricks inte|inget varmt|det är kallt|kyla|elementen ej|värme ej)\b": {
+                "response": "Jag förstår att det är kallt. Har du provat termostaten? Ring oss på 0793-006638 så hjälper vi dig att felsöka värmen. Akuta ärenden prioriteras.",
+                "intent": "heating_issue",
+                "lead_score": 2
+            },
+
+            # URGENT - No electricity
+            r"\b(ingen ström|strömavbrott|slut|inte fungerar|mörkt|ljuset fungerar ej|elektricitet|el av|avbrott)\b": {
+                "response": "Strömavbrott? Kontrollera först din säkringsskärm i trapphus. Är hela fastigheten drabbad? Ring 0793-006638 om det är akut.",
+                "intent": "electric_issue",
+                "lead_score": 2
+            },
+
+            # Broken things (medium urgency)
+            r"\b(gått sönder|trasig sönder|tras|sönder|tillbörd sönder|har gått sönder)\b": {
+                "response": "Jag förstår att något har gått sönder. Vad har hänt? Beskriv gärna vad som är trasigt så att vi kan hjälpa dig på bästa sätt. Ring 0793-006638 för snabb hjälp.",
+                "intent": "damaged_item",
+                "lead_score": 2
+            },
             r"\b(vem är ni|vilka är ni|om företaget|bolaget|company)\b": {
                 "response": f"{company_name} är ett fastighetsförvaltningsföretag som erbjuder drift och underhåll, ekonomisk förvaltning och hyresadministration för bostadsrättsföreningar och kommersiella fastigheter.",
                 "intent": "about",

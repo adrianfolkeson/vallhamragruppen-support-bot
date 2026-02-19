@@ -20,6 +20,8 @@ from security import SecurityManager, SecurityLevel
 from proactive import ProactiveSupportEngine, MicroConversionEngine
 from escalation import EscalationEngine, EscalationReason
 from metrics import MetricsEngine
+from fault_reports import FaultReportSystem, get_fault_system
+from local_model import LocalModel
 
 
 @dataclass
@@ -95,6 +97,8 @@ class SupportStarterBot:
         self.micro_conversions = MicroConversionEngine()
         self.escalation_engine = EscalationEngine()
         self.metrics = MetricsEngine()
+        self.fault_system = FaultReportSystem()
+        self.local_model = LocalModel(company_name=self.config.COMPANY_NAME)
 
         # Initialize RAG with knowledge base
         self.rag = self._create_knowledge_base()
@@ -241,10 +245,78 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
         session = self.memory.get_or_create_session(session_id)
         self.metrics.track_conversation_start(session_id)
 
-        # 3. Classify intent
+        # 3. Check for FAULT REPORTS first (all urgent issues like water leaks, lockouts, etc.)
+        fault_result = self.fault_system.collect_fault_report(
+            message,
+            {
+                "session_id": session_id,
+                "customer_name": session.memory.get("customer_name", {}).get("value"),
+                "customer_email": session.memory.get("customer_email", {}).get("value"),
+                "customer_phone": session.memory.get("customer_phone", {}).get("value")
+            }
+        )
+
+        # Check if this is a fault report (any urgency level above LOW)
+        # LOW urgency is "just asking" - continue to normal flow
+        # MEDIUM+ urgency means there's an actual issue - handle with fault response
+        if fault_result["report"].urgency != fault_result["report"].urgency.LOW:
+            report = fault_result["report"]
+            is_urgent = report.urgency in [report.urgency.CRITICAL, report.urgency.HIGH]
+
+            # Track metrics
+            if is_urgent:
+                self.metrics.track_escalation(session_id, "fault_" + report.urgency.value)
+
+            # Save fault report to persistent storage
+            try:
+                from persistent_memory import get_persistent_memory
+                mem = get_persistent_memory()
+                mem.save_fault_report({
+                    "report_id": fault_result["report"].report_id,
+                    "category": fault_result["report"].category.value,
+                    "urgency": fault_result["report"].urgency.value,
+                    "description": fault_result["report"].description,
+                    "session_id": session_id,
+                    "reporter_email": fault_result["report"].reporter_email,
+                    "reporter_phone": fault_result["report"].reporter_phone
+                })
+            except:
+                pass  # Continue without persistence if unavailable
+
+            # Check if we need more info
+            if fault_result["collect_more_info"]:
+                questions = self.fault_system.get_collection_questions(fault_result["report"])
+                follow_up = "\n\n" + "\n".join(f"{i+1}. {q}" for i, q in enumerate(questions))
+            else:
+                follow_up = ""
+
+            return create_response(
+                reply=fault_result["response"] + follow_up,
+                intent="fault_report",
+                confidence=0.95,
+                sentiment="neutral" if report.urgency != report.urgency.CRITICAL else "frustrated",
+                lead_score=2,
+                escalate=is_urgent,
+                action="collect_info"
+            )
+
+        # 4. Check if local model can handle this (faster, no API cost)
+        if self.local_model.can_handle(message):
+            local_result = self.local_model.generate(message)
+            return create_response(
+                reply=local_result["response"],
+                intent=local_result["intent"],
+                confidence=local_result["confidence"],
+                sentiment="neutral",
+                lead_score=local_result["lead_score"],
+                escalate=local_result["escalate"],
+                action="escalate" if local_result["escalate"] else "none"
+            )
+
+        # 5. Classify intent
         router_result = self.router.classify(message, conversation_history)
 
-        # 4. Update metrics
+        # 6. Update metrics
         self.metrics.track_message(
             session_id, "user",
             intent=router_result.intent.value,
@@ -252,11 +324,11 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             lead_score=router_result.lead_score
         )
 
-        # 5. Extract and store info
+        # 7. Extract and store info
         for info_type, value in extract_info_from_message(message):
             self.memory.extract_and_store_info(session_id, info_type, value)
 
-        # 6. Check for escalation
+        # 8. Check for escalation
         should_escalate, escalation_reason = self.escalation_engine.should_escalate(
             router_result.intent.value,
             router_result.sentiment.value,
