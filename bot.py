@@ -577,9 +577,7 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             # Remove any remaining "Q:" prefix
             if response.startswith("Q: "):
                 response = response.split("A: ")[-1] if "A: " in response else response[3:]
-            # Add a friendly closing if the response is short
-            if len(response) < 200:
-                response += "\n\nRing 0793-006638 för mer information eller visning."
+            # Return the FAQ response as-is (don't add automatic phone text)
             return response
 
         # Check for direct FAQ match using trigger phrases
