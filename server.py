@@ -414,13 +414,19 @@ setup_dashboard_routes(app)
 @app.get("/admin")
 async def admin_page():
     """Admin page with backup download buttons"""
-    return FileResponse("admin.html")
+    admin_path = Path(__file__).parent / "admin.html"
+    if admin_path.exists():
+        return FileResponse(str(admin_path))
+    raise HTTPException(status_code=404, detail="Admin page not found")
 
 
 @app.get("/admin.html")
 async def admin_page_html():
     """Admin page (alternate route)"""
-    return FileResponse("admin.html")
+    admin_path = Path(__file__).parent / "admin.html"
+    if admin_path.exists():
+        return FileResponse(str(admin_path))
+    raise HTTPException(status_code=404, detail="Admin page not found")
 
 
 @app.get("/export")
