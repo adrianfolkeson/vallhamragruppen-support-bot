@@ -58,8 +58,9 @@ class BotConfig:
     fault_general_high: str = "Viktigt ärende. Ring {phone} och berätta vad som hänt."
     fault_water_medium: str = "Vattenproblem. 💧 Läcka eller droppande kran? Var i lägenheten?"
     fault_appliance_medium: str = "Vitvaror. 🏠 Köpt av dig eller ingår i fastigheten? Ring {phone}."
+    fault_noise_medium: str = "Störningar från grannar! 👂 Jag hjälper dig göra en felanmälan. För att kunna hjälpa dig bäst behöver jag:\n\n1. Beskriv vad problemet är\n2. Din adress och lägenhetsnummer\n3. Ditt telefonnummer eller e-post"
     fault_general_medium: str = "Beskriv problemet. Var i fastigheten? Är det akut eller kan vänta?"
-    fault_general_low: str = "Vad gäller? 🤔 Felanmälan når du på {phone}. Berätta vad som hänt."
+    fault_general_low: str = "Vad gäller? 🤔 Berätta vad som hänt så hjälper jag dig göra en felanmälan. Jag behöver:\n1. Beskrivning av problemet\n2. Adress och lägenhetsnummer\n3. Dina kontaktuppgifter"
 
     # Local model responses (templates)
     greeting_response: str = "Hej! 👋 {company_name} här. Jag hjälper med frågor om fastigheter och förvaltning."

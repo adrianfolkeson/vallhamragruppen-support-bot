@@ -184,7 +184,7 @@ class SupportStarterBot:
         self.micro_conversions = MicroConversionEngine()
         self.escalation_engine = EscalationEngine()
         self.metrics = MetricsEngine()
-        self.fault_system = FaultReportSystem()
+        self.fault_system = get_fault_system()  # Use singleton to share pending reports across instances
         self.local_model = LocalModel(config=self.config)
         self.log_manager = get_log_manager()  # Chat logging & notifications
 
@@ -361,11 +361,12 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             }
         )
 
-        # Check if this is a fault report (any urgency level above LOW)
-        # LOW urgency is "just asking" - continue to normal flow
-        # MEDIUM+ urgency means there's an actual issue - handle with fault response
-        if fault_result["report"].urgency != fault_result["report"].urgency.LOW:
-            report = fault_result["report"]
+        # Check if this is a fault report
+        # Handle ALL fault reports (even LOW urgency) to collect info and create tickets
+        # Only skip if category is OTHER (generic questions)
+        from fault_reports import FaultCategory
+        report = fault_result["report"]
+        if report.category != FaultCategory.OTHER:
             is_urgent = report.urgency in [report.urgency.CRITICAL, report.urgency.HIGH]
 
             # Track metrics
@@ -383,19 +384,15 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
                     "description": fault_result["report"].description,
                     "session_id": session_id,
                     "reporter_email": fault_result["report"].reporter_email,
-                    "reporter_phone": fault_result["report"].reporter_phone
+                    "reporter_phone": fault_result["report"].reporter_phone,
+                    "location": fault_result["report"].location
                 })
             except:
                 pass  # Continue without persistence if unavailable
 
-            # Check if we need more info
-            if fault_result["collect_more_info"]:
-                questions = self.fault_system.get_collection_questions(fault_result["report"])
-                follow_up = "\n\n" + "\n".join(f"{i+1}. {q}" for i, q in enumerate(questions))
-            else:
-                follow_up = ""
-
-            reply = fault_result["response"] + follow_up
+            # fault_result["response"] already contains the full response from fault_reports.py
+            # Don't add follow_up again - fault_reports handles it
+            reply = fault_result["response"]
             self._log_bot_response(session_id, reply, "fault_report", is_urgent,
                                   urgency=report.urgency.value)
             return create_response(
