@@ -6,13 +6,17 @@ REST API server for the AI bot with webhooks and logging
 
 import os
 import sys
+import zipfile
+import io
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, List, Dict, Any
 import uvicorn
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 # Add current directory to path for imports
@@ -401,6 +405,113 @@ def send_test_notification():
 # Analytics Dashboard Routes
 from analytics_dashboard import setup_dashboard_routes
 setup_dashboard_routes(app)
+
+
+# ============================================================================
+# BACKUP / EXPORT ENDPOINTS
+# ============================================================================
+
+@app.get("/admin")
+async def admin_page():
+    """Admin page with backup download buttons"""
+    return FileResponse("admin.html")
+
+
+@app.get("/admin.html")
+async def admin_page_html():
+    """Admin page (alternate route)"""
+    return FileResponse("admin.html")
+
+
+@app.get("/export")
+async def export_full_backup():
+    """
+    Export full backup as ZIP file
+    Contains: config files, chat logs, and data
+    """
+    memory_file = io.BytesIO()
+
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        # Add config files
+        config_dir = Path("config")
+        if config_dir.exists():
+            for file in config_dir.rglob("*"):
+                if file.is_file():
+                    arcname = f"config/{file.relative_to(config_dir)}"
+                    zf.write(file, arcname)
+
+        # Add chat logs
+        logs_dir = Path("chat_logs")
+        if logs_dir.exists():
+            for file in logs_dir.rglob("*"):
+                if file.is_file():
+                    arcname = f"chat_logs/{file.relative_to(logs_dir)}"
+                    zf.write(file, arcname)
+
+        # Add data directory
+        data_dir = Path("data")
+        if data_dir.exists():
+            for file in data_dir.rglob("*"):
+                if file.is_file():
+                    arcname = f"data/{file.relative_to(data_dir)}"
+                    zf.write(file, arcname)
+
+        # Add metadata
+        metadata = f"""Support Intelligence - Backup Export
+=====================================
+Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Version: 2.0.0
+"""
+        zf.writestr("backup_info.txt", metadata)
+
+    memory_file.seek(0)
+
+    from fastapi.responses import Response
+    return Response(
+        content=memory_file.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename=support-intelligence-backup-{datetime.now().strftime('%Y%m%d')}.zip"
+        }
+    )
+
+
+@app.get("/export/compact")
+async def export_compact():
+    """
+    Export compact backup (config only)
+    Smaller download, just the configuration files
+    """
+    memory_file = io.BytesIO()
+
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        # Add only config files
+        config_dir = Path("config")
+        if config_dir.exists():
+            for file in config_dir.rglob("*"):
+                if file.is_file():
+                    arcname = f"config/{file.relative_to(config_dir)}"
+                    zf.write(file, arcname)
+
+        # Add metadata
+        metadata = f"""Support Intelligence - Compact Export
+=========================================
+Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Version: 2.0.0
+Type: Config only
+"""
+        zf.writestr("export_info.txt", metadata)
+
+    memory_file.seek(0)
+
+    from fastapi.responses import Response
+    return Response(
+        content=memory_file.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename=support-intelligence-config-{datetime.now().strftime('%Y%m%d')}.zip"
+        }
+    )
 
 
 # Run server
