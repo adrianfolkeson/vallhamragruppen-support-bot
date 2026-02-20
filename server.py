@@ -539,4 +539,8 @@ if __name__ == "__main__":
     if not os.getenv("ANTHROPIC_API_KEY"):
         print("⚠️  WARNING: ANTHROPIC_API_KEY not set. Bot will use fallback responses.")
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Railway sets PORT env var - use it for production
+    port = int(os.getenv("PORT", 8000))
+    print(f"🚀 Starting server on port {port}")
+
+    uvicorn.run(app, host="0.0.0.0", port=port)
