@@ -25,6 +25,7 @@ from local_model import LocalModel
 from chat_logger import LogManager, get_log_manager
 from config_loader import load_config_or_default, BotConfig as ConfigBotConfig
 from sheets_admin import HybridConfigLoader
+from vector_store import get_vector_store, CHROMADB_AVAILABLE
 
 
 @dataclass
@@ -187,6 +188,7 @@ class SupportStarterBot:
         self.fault_system = get_fault_system()  # Use singleton to share pending reports across instances
         self.local_model = LocalModel(config=self.config)
         self.log_manager = get_log_manager()  # Chat logging & notifications
+        self.vector_store = get_vector_store() if CHROMADB_AVAILABLE else None
 
         # Initialize RAG with knowledge base
         self.rag = self._create_knowledge_base()
@@ -544,8 +546,8 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
             try:
                 response = self.client.messages.create(
                     model="claude-3-5-sonnet-20241022",
-                    max_tokens=800,  # Increased for more detailed answers
-                    temperature=0.5,  # Slightly higher for more natural responses
+                    max_tokens=1500,  # Increased for detailed, comprehensive answers
+                    temperature=0.5,  # Natural conversation flow
                     system=prompt,
                     messages=[{"role": "user", "content": message}]
                 )
@@ -558,11 +560,26 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
         return self._get_fallback_response(message, router_result, session)
 
     def _get_fallback_response(self, message: str, router_result, session) -> str:
-        """Get fallback response when API is unavailable - uses RAG for smart answers"""
+        """Get fallback response when API is unavailable - uses vector search for smart answers"""
         intent = router_result.intent.value
         sentiment = router_result.sentiment.value
 
-        # First, try to get relevant FAQ from RAG
+        # First, try semantic search from ChromaDB (better than keyword RAG)
+        if self.vector_store:
+            vector_results = self.vector_store.search(message, n_results=2)
+            if vector_results and len(vector_results) > 0:
+                top_result = vector_results[0]
+                # Only use if similarity is high enough (>= 0.6)
+                if top_result["similarity"] >= 0.6:
+                    response = top_result["metadata"].get("answer", top_result["content"])
+                    # Clean up format if needed
+                    if "Question: " in response:
+                        parts = response.split("Answer: ")
+                        if len(parts) > 1:
+                            response = parts[1]
+                    return response.strip()
+
+        # Third, try keyword-based RAG
         rag_results = self.rag.retrieve(message, top_k=3)
         if rag_results.chunks and len(rag_results.chunks) > 0:
             # We found relevant knowledge - return the top result

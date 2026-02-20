@@ -398,6 +398,11 @@ def send_test_notification():
         print(f"Error sending test notification: {e}")
 
 
+# Analytics Dashboard Routes
+from analytics_dashboard import setup_dashboard_routes
+setup_dashboard_routes(app)
+
+
 # Run server
 if __name__ == "__main__":
     print("""
