@@ -463,7 +463,7 @@ async def export_full_backup():
                     zf.write(file, arcname)
 
         # Add metadata
-        metadata = f"""Support Intelligence - Backup Export
+        metadata = f"""Support Starter AI - Backup Export
 =====================================
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Version: 2.0.0
@@ -477,7 +477,7 @@ Version: 2.0.0
         content=memory_file.getvalue(),
         media_type="application/zip",
         headers={
-            "Content-Disposition": f"attachment; filename=support-intelligence-backup-{datetime.now().strftime('%Y%m%d')}.zip"
+            "Content-Disposition": f"attachment; filename=support-starter-backup-{datetime.now().strftime('%Y%m%d')}.zip"
         }
     )
 
@@ -500,7 +500,7 @@ async def export_compact():
                     zf.write(file, arcname)
 
         # Add metadata
-        metadata = f"""Support Intelligence - Compact Export
+        metadata = f"""Support Starter AI - Compact Export
 =========================================
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Version: 2.0.0
@@ -515,7 +515,7 @@ Type: Config only
         content=memory_file.getvalue(),
         media_type="application/zip",
         headers={
-            "Content-Disposition": f"attachment; filename=support-intelligence-config-{datetime.now().strftime('%Y%m%d')}.zip"
+            "Content-Disposition": f"attachment; filename=support-starter-config-{datetime.now().strftime('%Y%m%d')}.zip"
         }
     )
 
