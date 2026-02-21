@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Starter AI - Setup Wizard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .progress-step.active {
+            background: #667eea;
+        }
+
+        .progress-step.completed {
+            background: #22c55e;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .config-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .faq-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .faq-item input {
+            background: white;
+            margin-bottom: 10px;
+        }
+
+        .faq-item textarea {
+            background: white;
+        }
+
+        .add-faq {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .add-faq:hover {
+            background: #e0f2fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">SS</div>
+        <h1 id="title">Support Starter AI</h1>
+        <p class="subtitle" id="subtitle">Setup Wizard - Kom igång på 2 minuter</p>
+
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1"></div>
+            <div class="progress-step" data-step="2"></div>
+            <div class="progress-step" data-step="3"></div>
+            <div class="progress-step" data-step="4"></div>
+        </div>
+
+        <!-- Step 1: Basic Info -->
+        <div class="step active" data-step="1">
+            <h2 class="step-title">Steg 1: Grundläggande Info</h2>
+
+            <div class="form-group">
+                <label>Företagsnamn *</label>
+                <input type="text" id="company_name" placeholder="T.ex. Vallhamragruppen AB">
+            </div>
+
+            <div class="form-group">
+                <label>Tenant ID *</label>
+                <input type="text" id="tenant_id" placeholder="T.ex. vallhamra (utan mellanslag)">
+                <div class="hint">Unikt ID för ditt system. Använd små bokstäver och inga mellanslag.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Telefonnummer *</label>
+                <input type="tel" id="phone" placeholder="T.ex. 0793-006638">
+            </div>
+
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" id="email" placeholder="T.ex. info@foretaget.se">
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="nextStep(1)">Nästa →</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Business Info -->
+        <div class="step" data-step="2">
+            <h2 class="step-title">Steg 2: Företagsinformation</h2>
+
+            <div class="form-group">
+                <label>Orter / Områden *</label>
+                <input type="text" id="locations" placeholder="T.ex. Stockholm, Göteborg, Malmö">
+                <div class="hint">Var verkar ni? Separera med kommatecken.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Öppettider *</label>
+                <input type="text" id="hours" placeholder="T.ex. Mån-Fre 08:00-17:00">
+            </div>
+
+            <div class="form-group">
+                <label>Vad erbjuder ni? *</label>
+                <textarea id="services" placeholder="T.ex. Lägenheter, bostadsrätter, fastighetsförvaltning"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep(2)">← Föregående</button>
+                <button class="btn btn-primary" onclick="nextStep(2)">Nästa →</button>
+            </div>
+        </div>
+
+        <!-- Step 3: FAQ -->
+        <div class="step" data-step="3">
+            <h2 class="step-title">Steg 3: Vanliga Frågor (FAQ)</h2>
+            <p style="color: #666; margin-bottom: 20px;">Lägg till vanliga frågor som kunder har. Du kan alltid ändra detta senare.</p>
+
+            <div id="faq-list">
+                <div class="faq-item">
+                    <input type="text" placeholder="Fråga" value="Hur gör jag en felanmälan?">
+                    <textarea placeholder="Svar">Berätta vad som har hänt så hjälper jag dig göra en felanmälan direkt. Vilken typ av problem gäller det och var i fastigheten?</textarea>
+                </div>
+                <div class="faq-item">
+                    <input type="text" placeholder="Fråga" value="Vilka är dina öppettider?">
+                    <textarea placeholder="Svar">Vi har öppet vardagar 08:00-17:00. För akuta ärenden utanför kontorstid, ring vår jour på 0793-006638.</textarea>
+                </div>
+            </div>
+
+            <div class="add-faq" onclick="addFaq()">+ Lägg till fråga</div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep(3)">← Föregående</button>
+                <button class="btn btn-primary" onclick="nextStep(3)">Nästa →</button>
+            </div>
+        </div>
+
+        <!-- Step 4: API & Deploy -->
+        <div class="step" data-step="4">
+            <h2 class="step-title">Steg 4: API & Install</h2>
+
+            <div class="form-group">
+                <label>Anthropic API Key *</label>
+                <input type="password" id="api_key" placeholder="sk-ant-xxxxx">
+                <div class="hint">
+                    Hämta din API key från <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+                    Costar ca $1-10/mån beroende på användning.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="create_config" checked>
+                    <label for="create_config" style="margin: 0;">Skapa config-fil automatiskt</label>
+                </div>
+            </div>
+
+            <div id="config-preview-container" style="display: none;">
+                <label>Config Preview:</label>
+                <div class="config-preview" id="config-preview"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep(4)">← Föregående</button>
+                <button class="btn btn-primary" onclick="finishSetup()">🚀 Skapa & Deploya</button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="step" data-step="loading">
+            <div class="loading">
+                <div class="spinner"></div>
+                <h2>Skapar din bot...</h2>
+                <p id="loading-status">Genererar config-fil...</p>
+            </div>
+        </div>
+
+        <!-- Success -->
+        <div class="step" data-step="success">
+            <div class="success">
+                <div class="success-icon">🎉</div>
+                <h2>Klar!</h2>
+                <p>Din bot är nu skapad och redo att deployas!</p>
+
+                <div id="download-section" style="margin-top: 30px;">
+                    <div class="config-preview" id="final-config"></div>
+                </div>
+
+                <div class="button-group" style="flex-direction: column;">
+                    <button class="btn btn-primary" onclick="downloadConfig()">📥 Ladda ner Config</button>
+                    <button class="btn btn-secondary" onclick="copyConfig()">📋 Kopiera Config</button>
+                    <button class="btn btn-secondary" onclick="showDeployInstructions()">📀 Deploy Instructions</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deploy Instructions -->
+        <div class="step" data-step="deploy">
+            <h2 class="step-title">Deploy Instructions</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; font-size: 0.9rem;">
+                <strong>Alternativ 1: Railway (Enklast)</strong>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>Gå till <a href="https://railway.app" target="_blank">railway.app</a></li>
+                    <li>Connecta ditt GitHub repo med Support Starter</li>
+                    <li>Lägg till <code>ANTHROPIC_API_KEY</code> i env vars</li>
+                    <li>Ladda upp din config-fil till <code>config/</code> mappen</li>
+                    <li>Klicka "Deploy"</li>
+                </ol>
+
+                <strong style="display: block; margin-top: 20px;">Alternativ 2: Render</strong>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>Gå till <a href="https://render.com" target="_blank">render.com</a></li>
+                    <li>Skapa ny "Web Service"</li>
+                    <li>Connecta GitHub repo</li>
+                    <li>Sätt env vars och deploya</li>
+                </ol>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToStep('success')">← Tillbaka</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentStep: 1,
+            data: {}
+        };
+
+        function updateProgress(step) {
+            document.querySelectorAll('.progress-step').forEach((el, index) => {
+                el.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    el.classList.add('completed');
+                } else if (index + 1 === step) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            if (typeof step === 'string') {
+                document.querySelector(`[data-step="${step}"]`).classList.add('active');
+            } else {
+                document.querySelector(`[data-step="${step}"]`).classList.add('active');
+                updateProgress(step);
+            }
+            state.currentStep = step;
+        }
+
+        function nextStep(current) {
+            // Validate current step
+            if (!validateStep(current)) return;
+
+            // Collect data
+            collectData(current);
+
+            // Move to next
+            goToStep(current + 1);
+        }
+
+        function prevStep(current) {
+            goToStep(current - 1);
+        }
+
+        function validateStep(step) {
+            switch(step) {
+                case 1:
+                    const companyName = document.getElementById('company_name').value.trim();
+                    const tenantId = document.getElementById('tenant_id').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const email = document.getElementById('email').value.trim();
+
+                    if (!companyName || !tenantId || !phone || !email) {
+                        alert('Vänligen fyll i alla fält');
+                        return false;
+                    }
+
+                    // Validate tenant_id format
+                    if (!/^[a-z0-9_-]+$/.test(tenantId)) {
+                        alert('Tenant ID får bara innehålla små bokstäver, siffror, bindestreck och understreck');
+                        return false;
+                    }
+
+                    if (!email.includes('@')) {
+                        alert('Vänligen ange en giltig email');
+                        return false;
+                    }
+                    break;
+                case 2:
+                    const locations = document.getElementById('locations').value.trim();
+                    const hours = document.getElementById('hours').value.trim();
+                    const services = document.getElementById('services').value.trim();
+
+                    if (!locations || !hours || !services) {
+                        alert('Vänligen fyll i alla fält');
+                        return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+
+        function collectData(step) {
+            switch(step) {
+                case 1:
+                    state.data.company_name = document.getElementById('company_name').value.trim();
+                    state.data.tenant_id = document.getElementById('tenant_id').value.trim();
+                    state.data.phone = document.getElementById('phone').value.trim();
+                    state.data.email = document.getElementById('email').value.trim();
+                    break;
+                case 2:
+                    state.data.locations = document.getElementById('locations').value.trim();
+                    state.data.business_hours = document.getElementById('hours').value.trim();
+                    state.data.services = document.getElementById('services').value.trim();
+                    break;
+                case 3:
+                    state.data.faq_data = [];
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        const q = item.querySelector('input').value.trim();
+                        const a = item.querySelector('textarea').value.trim();
+                        if (q && a) {
+                            state.data.faq_data.push({ question: q, answer: a });
+                        }
+                    });
+                    break;
+                case 4:
+                    state.data.api_key = document.getElementById('api_key').value.trim();
+                    break;
+            }
+        }
+
+        function addFaq() {
+            const container = document.getElementById('faq-list');
+            const item = document.createElement('div');
+            item.className = 'faq-item';
+            item.innerHTML = `
+                <input type="text" placeholder="Fråga">
+                <textarea placeholder="Svar"></textarea>
+            `;
+            container.appendChild(item);
+        }
+
+        function generateConfig() {
+            const config = {
+                company_name: state.data.company_name,
+                tenant_id: state.data.tenant_id,
+                phone: state.data.phone,
+                contact_email: state.data.email,
+                locations: state.data.locations,
+                business_hours: state.data.business_hours,
+                services: state.data.services,
+                faq_data: state.data.faq_data || []
+            };
+
+            return JSON.stringify(config, null, 2);
+        }
+
+        function finishSetup() {
+            collectData(4);
+
+            if (!state.data.api_key) {
+                alert('Vänligen ange din API Key');
+                return;
+            }
+
+            // Show loading
+            goToStep('loading');
+
+            // Simulate setup process
+            const statuses = [
+                'Genererar config-fil...',
+                'Validerar inställningar...',
+                'Förbereder deployment...'
+            ];
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < statuses.length) {
+                    document.getElementById('loading-status').textContent = statuses[i];
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    showSuccess();
+                }
+            }, 600);
+        }
+
+        function showSuccess() {
+            const config = generateConfig();
+            document.getElementById('final-config').textContent = config;
+            goToStep('success');
+        }
+
+        function downloadConfig() {
+            const config = generateConfig();
+            const blob = new Blob([config], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${state.data.tenant_id}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyConfig() {
+            const config = generateConfig();
+            navigator.clipboard.writeText(config).then(() => {
+                alert('Config kopierad!');
+            });
+        }
+
+        function showDeployInstructions() {
+            goToStep('deploy');
+        }
+
+        // Auto-generate tenant_id from company name
+        document.getElementById('company_name')?.addEventListener('input', function() {
+            const tenantId = this.value.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 30);
+            if (!document.getElementById('tenant_id').value) {
+                document.getElementById('tenant_id').value = tenantId;
+            }
+        });
+
+        // Show config preview when api_key is entered
+        document.getElementById('api_key')?.addEventListener('input', function() {
+            if (this.value) {
+                document.getElementById('config-preview-container').style.display = 'block';
+                document.getElementById('config-preview').textContent = generateConfig();
+            }
+        });
+    </script>
+</body>
+</html>

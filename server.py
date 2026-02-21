@@ -126,7 +126,9 @@ async def root():
             "chat": "/chat",
             "health": "/health",
             "metrics": "/metrics",
-            "webhooks": "/webhooks"
+            "webhooks": "/webhooks",
+            "setup": "/setup",
+            "admin": "/admin"
         }
     }
 
@@ -405,6 +407,94 @@ def send_test_notification():
 # Analytics Dashboard Routes
 from analytics_dashboard import setup_dashboard_routes
 setup_dashboard_routes(app)
+
+
+# ============================================================================
+# SETUP WIZARD ENDPOINTS
+# ============================================================================
+
+@app.get("/setup")
+async def setup_wizard():
+    """Setup wizard page for onboarding new customers"""
+    setup_path = Path(__file__).parent / "setup.html"
+    if setup_path.exists():
+        return FileResponse(str(setup_path))
+    raise HTTPException(status_code=404, detail="Setup wizard not found")
+
+
+@app.post("/api/setup/create-config")
+async def create_config(request: Dict[str, Any]):
+    """
+    Create a new tenant config from setup wizard
+
+    Expects:
+    {
+        "company_name": "Företag AB",
+        "tenant_id": "foretag",
+        "phone": "0793-006638",
+        "contact_email": "info@foretag.se",
+        "locations": "Stockholm, Göteborg",
+        "business_hours": "Mån-Fre 08-17",
+        "services": "Lägenheter, Bostadsrätter",
+        "faq_data": [...]
+    }
+    """
+    import json
+
+    try:
+        # Extract fields
+        tenant_id = request.get("tenant_id", "default")
+        company_name = request.get("company_name", "Företag")
+
+        # Build config object
+        config_data = {
+            "company_name": company_name,
+            "phone": request.get("phone", ""),
+            "contact_email": request.get("contact_email", ""),
+            "locations": request.get("locations", ""),
+            "business_hours": request.get("business_hours", ""),
+            "services": request.get("services", ""),
+            "greeting_response": f"Hej! Jag är {company_name}s digitala kundtjänst. Hur kan jag hjälpa dig idag?",
+            "contact_response": f"Du når oss på {request.get('phone', '')} eller {request.get('contact_email', '')}.",
+            "hours_response": request.get("business_hours", ""),
+            "faq_data": request.get("faq_data", []),
+            "fault_report_keywords": ["felanmälan", "problem", "fel", "trasig", "fungerar inte", "läcka"],
+            "emergency_keywords": ["akut", "brinner", "brand", "gasläcka", "översvämning", "vattenläcka"],
+            "escalation": {
+                "enable_lead_scoring": True,
+                "auto_escalate_threshold": 4,
+                "lead_threshold": 3
+            }
+        }
+
+        # Ensure config directory exists
+        config_dir = Path(__file__).parent / "config"
+        config_dir.mkdir(exist_ok=True)
+
+        # Write config file
+        config_file = config_dir / f"{tenant_id}.json"
+        with open(config_file, 'w', encoding='utf-8') as f:
+            json.dump(config_data, f, indent=2, ensure_ascii=False)
+
+        return {
+            "status": "success",
+            "message": f"Config skapad för {company_name}",
+            "config_file": str(config_file),
+            "tenant_id": tenant_id
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating config: {str(e)}")
+
+
+@app.get("/api/setup/validate-tenant")
+async def validate_tenant(tenant_id: str = Query(..., description="Tenant ID to validate")):
+    """Check if a tenant ID is available (not already taken)"""
+    config_file = Path(__file__).parent / "config" / f"{tenant_id}.json"
+    return {
+        "available": not config_file.exists(),
+        "tenant_id": tenant_id
+    }
 
 
 # ============================================================================
