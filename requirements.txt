@@ -10,6 +10,10 @@ pydantic>=2.5.0
 python-dotenv>=1.0.0
 requests>=2.31.0
 
+# Vector store
+chromadb>=0.4.0
+
 # Dashboard
 streamlit>=1.28.0
 pandas>=2.0.0
+plotly>=5.18.0

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Starter AI - Setup Wizard</title>
+    <title>Support Starter AI - Kom Igång på 2 Minuter</title>
     <style>
         * {
             margin: 0;
@@ -23,10 +23,10 @@
 
         .container {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
         }
 
@@ -38,22 +38,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
+            font-size: 2rem;
             margin: 0 auto 20px;
         }
 
         h1 {
             color: #1a1a2e;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
+            font-size: 1.8rem;
         }
 
         .subtitle {
             color: #666;
             text-align: center;
             margin-bottom: 30px;
+            font-size: 1rem;
         }
 
         .progress-bar {
@@ -64,9 +64,9 @@
 
         .progress-step {
             flex: 1;
-            height: 4px;
+            height: 6px;
             background: #e0e0e0;
-            border-radius: 2px;
+            border-radius: 3px;
             transition: background 0.3s;
         }
 
@@ -84,6 +84,34 @@
 
         .step.active {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
         }
 
         .form-group {
@@ -95,18 +123,20 @@
             font-weight: 600;
             margin-bottom: 8px;
             color: #333;
+            font-size: 0.95rem;
         }
 
-        input, textarea, select {
+        input, textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             transition: border-color 0.2s;
+            font-family: inherit;
         }
 
-        input:focus, textarea:focus, select:focus {
+        input:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -120,6 +150,30 @@
             font-size: 0.85rem;
             color: #666;
             margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .hint-icon {
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .button-group {
@@ -130,13 +184,17 @@
 
         .btn {
             flex: 1;
-            padding: 14px 24px;
+            padding: 16px 24px;
             border: none;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
@@ -158,30 +216,26 @@
             background: #e0e0e0;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .success {
             text-align: center;
-            padding: 40px;
+            padding: 20px;
         }
 
         .success-icon {
-            font-size: 4rem;
+            font-size: 5rem;
             margin-bottom: 20px;
         }
 
         .config-preview {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: #1a1a2e;
+            color: #22c55e;
+            border-radius: 12px;
             padding: 20px;
             margin: 20px 0;
             font-family: monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             white-space: pre-wrap;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
@@ -191,9 +245,9 @@
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #e0e0e0;
+            width: 60px;
+            height: 60px;
+            border: 5px solid #e0e0e0;
             border-top-color: #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -204,28 +258,28 @@
             to { transform: rotate(360deg); }
         }
 
-        .step-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #1a1a2e;
+        .api-help {
+            background: #fef3c7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 0.9rem;
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .api-help-steps {
+            margin-top: 12px;
+            padding-left: 20px;
         }
 
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
+        .api-help-steps li {
+            margin-bottom: 8px;
         }
 
         .faq-item {
             background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
         }
 
         .faq-item input {
@@ -240,23 +294,52 @@
         .add-faq {
             background: #f0f9ff;
             color: #0369a1;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             text-align: center;
             cursor: pointer;
             margin-top: 10px;
+            font-weight: 500;
+            transition: background 0.2s;
         }
 
         .add-faq:hover {
             background: #e0f2fe;
         }
+
+        .price-info {
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .price-info strong {
+            color: #16a34a;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">SS</div>
+        <div class="logo">🤖</div>
         <h1 id="title">Support Starter AI</h1>
-        <p class="subtitle" id="subtitle">Setup Wizard - Kom igång på 2 minuter</p>
+        <p class="subtitle" id="subtitle">Kom igång på 2 minuter - ingen teknisk kunskap krävs</p>
 
         <div class="progress-bar">
             <div class="progress-step active" data-step="1"></div>
@@ -267,52 +350,64 @@
 
         <!-- Step 1: Basic Info -->
         <div class="step active" data-step="1">
-            <h2 class="step-title">Steg 1: Grundläggande Info</h2>
+            <h2 class="step-title"><span class="step-number">1</span> Om ditt företag</h2>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Bra att veta</div>
+                Du kan ändra allt detta senare. Fyll bara i så gott du kan nu!
+            </div>
 
             <div class="form-group">
                 <label>Företagsnamn *</label>
                 <input type="text" id="company_name" placeholder="T.ex. Vallhamragruppen AB">
-            </div>
-
-            <div class="form-group">
-                <label>Tenant ID *</label>
-                <input type="text" id="tenant_id" placeholder="T.ex. vallhamra (utan mellanslag)">
-                <div class="hint">Unikt ID för ditt system. Använd små bokstäver och inga mellanslag.</div>
+                <div class="hint"><span class="hint-icon">ℹ️</span> Det officiella namnet på ditt företag</div>
             </div>
 
             <div class="form-group">
                 <label>Telefonnummer *</label>
                 <input type="tel" id="phone" placeholder="T.ex. 0793-006638">
+                <div class="hint"><span class="hint-icon">📞</span> Dit telefonnummer som kunder kan ringa till</div>
             </div>
 
             <div class="form-group">
                 <label>Email *</label>
                 <input type="email" id="email" placeholder="T.ex. info@foretaget.se">
+                <div class="hint"><span class="hint-icon">📧</span> Din företagsemail</div>
+            </div>
+
+            <div class="form-group">
+                <label>Var finns ni? *</label>
+                <input type="text" id="locations" placeholder="T.ex. Stockholm, Göteborg, Malmö">
+                <div class="hint"><span class="hint-icon">📍</span> Vilka städer/områden verkar ni i?</div>
             </div>
 
             <div class="button-group">
-                <button class="btn btn-primary" onclick="nextStep(1)">Nästa →</button>
+                <button class="btn btn-primary" onclick="nextStep(1)">
+                    Nästa →
+                </button>
             </div>
         </div>
 
-        <!-- Step 2: Business Info -->
+        <!-- Step 2: Business Details -->
         <div class="step" data-step="2">
-            <h2 class="step-title">Steg 2: Företagsinformation</h2>
-
-            <div class="form-group">
-                <label>Orter / Områden *</label>
-                <input type="text" id="locations" placeholder="T.ex. Stockholm, Göteborg, Malmö">
-                <div class="hint">Var verkar ni? Separera med kommatecken.</div>
-            </div>
+            <h2 class="step-title"><span class="step-number">2</span> Öppettider & Tjänster</h2>
 
             <div class="form-group">
                 <label>Öppettider *</label>
-                <input type="text" id="hours" placeholder="T.ex. Mån-Fre 08:00-17:00">
+                <input type="text" id="hours" placeholder="T.ex. Mån-Fre 08:00-17:00, Lör 10:00-14:00">
+                <div class="hint"><span class="hint-icon">🕐</span> När har ni öppet? Kunder får detta svar när de frågar</div>
             </div>
 
             <div class="form-group">
                 <label>Vad erbjuder ni? *</label>
-                <textarea id="services" placeholder="T.ex. Lägenheter, bostadsrätter, fastighetsförvaltning"></textarea>
+                <textarea id="services" placeholder="T.ex. Vi hyr ut lägenheter och bostadsrätter i Göteborg med omnejd. Vi erbjuder också fastighetsförvaltning."></textarea>
+                <div class="hint"><span class="hint-icon">🏢</span> Kort beskrivning av vad ditt företag gör</div>
+            </div>
+
+            <div class="form-group">
+                <label>Vad ska botten säga som hälsning?</label>
+                <input type="text" id="greeting" placeholder="Lämna tomt för automatisk hälsning">
+                <div class="hint"><span class="hint-icon">👋</span> Det första kunden hears när de startar chatten</div>
             </div>
 
             <div class="button-group">
@@ -323,8 +418,12 @@
 
         <!-- Step 3: FAQ -->
         <div class="step" data-step="3">
-            <h2 class="step-title">Steg 3: Vanliga Frågor (FAQ)</h2>
-            <p style="color: #666; margin-bottom: 20px;">Lägg till vanliga frågor som kunder har. Du kan alltid ändra detta senare.</p>
+            <h2 class="step-title"><span class="step-number">3</span> Vanliga frågor</h2>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Tips</div>
+                Lägg till de vanligaste frågorna dina kunder har. Botten kan svara på dessa direkt!
+            </div>
 
             <div id="faq-list">
                 <div class="faq-item">
@@ -333,11 +432,11 @@
                 </div>
                 <div class="faq-item">
                     <input type="text" placeholder="Fråga" value="Vilka är dina öppettider?">
-                    <textarea placeholder="Svar">Vi har öppet vardagar 08:00-17:00. För akuta ärenden utanför kontorstid, ring vår jour på 0793-006638.</textarea>
+                    <textarea placeholder="Svar">Du hittar våra öppettider på vår hemsida. För akuta ärenden utanför kontorstid, ring vår jour.</textarea>
                 </div>
             </div>
 
-            <div class="add-faq" onclick="addFaq()">+ Lägg till fråga</div>
+            <div class="add-faq" onclick="addFaq()">+ Lägg till ny fråga</div>
 
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="prevStep(3)">← Föregående</button>
@@ -345,34 +444,40 @@
             </div>
         </div>
 
-        <!-- Step 4: API & Deploy -->
+        <!-- Step 4: API Key -->
         <div class="step" data-step="4">
-            <h2 class="step-title">Steg 4: API & Install</h2>
+            <h2 class="step-title"><span class="step-number">4</span> Sista steget!</h2>
 
-            <div class="form-group">
-                <label>Anthropic API Key *</label>
-                <input type="password" id="api_key" placeholder="sk-ant-xxxxx">
-                <div class="hint">
-                    Hämta din API key från <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
-                    Costar ca $1-10/mån beroende på användning.
-                </div>
+            <div class="info-box" style="background: #fef3c7; border-left-color: #f59e0b;">
+                <div class="info-box-title">🔑 API Nyckel</div>
+                För att botten ska fungera behöver du en API-nyckel från Anthropic (som gör AI:n).
             </div>
 
             <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="create_config" checked>
-                    <label for="create_config" style="margin: 0;">Skapa config-fil automatiskt</label>
-                </div>
+                <label>Din API Nyckel *</label>
+                <input type="password" id="api_key" placeholder="sk-ant-xxxxx...">
+                <div class="hint"><span class="hint-icon">🔐</span> Börjar på "sk-ant-"</div>
             </div>
 
-            <div id="config-preview-container" style="display: none;">
-                <label>Config Preview:</label>
-                <div class="config-preview" id="config-preview"></div>
+            <div class="api-help">
+                <strong>❓ Har du ingen API-nyckel? Så här skaffar du en:</strong>
+                <ol class="api-help-steps">
+                    <li>Gå till <a href="https://console.anthropic.com" target="_blank" style="color: #667eea;">console.anthropic.com</a></li>
+                    <li>Klicka "Sign up" (logga in med Google fungerar också)</li>
+                    <li>Gå till "API Keys" i menyn till vänster</li>
+                    <li>Klicka "+ Create Key"</li>
+                    <li>Kopiera koden och klistra in ovan</li>
+                </ol>
+
+                <div class="price-info">
+                    <strong>💰 Kostar ca 50-150 kr/månad</strong><br>
+                    <small>Beror på hur många frågor botten får. Du får $5 gratis att testa med!</small>
+                </div>
             </div>
 
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="prevStep(4)">← Föregående</button>
-                <button class="btn btn-primary" onclick="finishSetup()">🚀 Skapa & Deploya</button>
+                <button class="btn btn-primary" onclick="finishSetup()">🚀 Skapa min bot!</button>
             </div>
         </div>
 
@@ -381,7 +486,7 @@
             <div class="loading">
                 <div class="spinner"></div>
                 <h2>Skapar din bot...</h2>
-                <p id="loading-status">Genererar config-fil...</p>
+                <p id="loading-status">Genererar config...</p>
             </div>
         </div>
 
@@ -389,44 +494,21 @@
         <div class="step" data-step="success">
             <div class="success">
                 <div class="success-icon">🎉</div>
-                <h2>Klar!</h2>
-                <p>Din bot är nu skapad och redo att deployas!</p>
+                <h2>Allt klart!</h2>
+                <p style="color: #666; margin-bottom: 20px;">Din bot-config är skapad! Välj vad du vill göra:</p>
 
-                <div id="download-section" style="margin-top: 30px;">
-                    <div class="config-preview" id="final-config"></div>
-                </div>
+                <div class="config-preview" id="final-config"></div>
 
                 <div class="button-group" style="flex-direction: column;">
-                    <button class="btn btn-primary" onclick="downloadConfig()">📥 Ladda ner Config</button>
-                    <button class="btn btn-secondary" onclick="copyConfig()">📋 Kopiera Config</button>
-                    <button class="btn btn-secondary" onclick="showDeployInstructions()">📀 Deploy Instructions</button>
+                    <button class="btn btn-primary" onclick="downloadConfig()">📥 Ladda ner config-fil</button>
+                    <button class="btn btn-secondary" onclick="copyConfig()">📋 Kopiera config</button>
+                    <button class="btn btn-secondary" onclick="emailConfig()">📧 Skicka via email</button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Deploy Instructions -->
-        <div class="step" data-step="deploy">
-            <h2 class="step-title">Deploy Instructions</h2>
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; font-size: 0.9rem;">
-                <strong>Alternativ 1: Railway (Enklast)</strong>
-                <ol style="margin-left: 20px; margin-top: 10px;">
-                    <li>Gå till <a href="https://railway.app" target="_blank">railway.app</a></li>
-                    <li>Connecta ditt GitHub repo med Support Starter</li>
-                    <li>Lägg till <code>ANTHROPIC_API_KEY</code> i env vars</li>
-                    <li>Ladda upp din config-fil till <code>config/</code> mappen</li>
-                    <li>Klicka "Deploy"</li>
-                </ol>
-
-                <strong style="display: block; margin-top: 20px;">Alternativ 2: Render</strong>
-                <ol style="margin-left: 20px; margin-top: 10px;">
-                    <li>Gå till <a href="https://render.com" target="_blank">render.com</a></li>
-                    <li>Skapa ny "Web Service"</li>
-                    <li>Connecta GitHub repo</li>
-                    <li>Sätt env vars och deploya</li>
-                </ol>
-            </div>
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="goToStep('success')">← Tillbaka</button>
+                <div class="info-box" style="margin-top: 20px; background: #f0fdf4; border-left-color: #22c55e;">
+                    <div class="info-box-title">✅ Nästa steg</div>
+                    Skicka config-filen till oss så sätter vi upp din bot inom 24 timmar!
+                </div>
             </div>
         </div>
     </div>
@@ -460,13 +542,13 @@
         }
 
         function nextStep(current) {
-            // Validate current step
-            if (!validateStep(current)) return;
-
-            // Collect data
+            console.log('nextStep called with:', current);
+            if (!validateStep(current)) {
+                console.log('Validation failed');
+                return;
+            }
             collectData(current);
-
-            // Move to next
+            console.log('Going to step:', current + 1);
             goToStep(current + 1);
         }
 
@@ -477,34 +559,26 @@
         function validateStep(step) {
             switch(step) {
                 case 1:
-                    const companyName = document.getElementById('company_name').value.trim();
-                    const tenantId = document.getElementById('tenant_id').value.trim();
+                    const company = document.getElementById('company_name').value.trim();
                     const phone = document.getElementById('phone').value.trim();
                     const email = document.getElementById('email').value.trim();
+                    const locations = document.getElementById('locations').value.trim();
 
-                    if (!companyName || !tenantId || !phone || !email) {
-                        alert('Vänligen fyll i alla fält');
+                    if (!company || !phone || !email || !locations) {
+                        alert('Vänligen fyll i alla fält med *');
                         return false;
                     }
-
-                    // Validate tenant_id format
-                    if (!/^[a-z0-9_-]+$/.test(tenantId)) {
-                        alert('Tenant ID får bara innehålla små bokstäver, siffror, bindestreck och understreck');
-                        return false;
-                    }
-
                     if (!email.includes('@')) {
                         alert('Vänligen ange en giltig email');
                         return false;
                     }
                     break;
                 case 2:
-                    const locations = document.getElementById('locations').value.trim();
                     const hours = document.getElementById('hours').value.trim();
                     const services = document.getElementById('services').value.trim();
 
-                    if (!locations || !hours || !services) {
-                        alert('Vänligen fyll i alla fält');
+                    if (!hours || !services) {
+                        alert('Vänligen fyll i alla fält med *');
                         return false;
                     }
                     break;
@@ -516,14 +590,14 @@
             switch(step) {
                 case 1:
                     state.data.company_name = document.getElementById('company_name').value.trim();
-                    state.data.tenant_id = document.getElementById('tenant_id').value.trim();
                     state.data.phone = document.getElementById('phone').value.trim();
                     state.data.email = document.getElementById('email').value.trim();
+                    state.data.locations = document.getElementById('locations').value.trim();
                     break;
                 case 2:
-                    state.data.locations = document.getElementById('locations').value.trim();
                     state.data.business_hours = document.getElementById('hours').value.trim();
                     state.data.services = document.getElementById('services').value.trim();
+                    state.data.greeting = document.getElementById('greeting').value.trim();
                     break;
                 case 3:
                     state.data.faq_data = [];
@@ -553,15 +627,32 @@
         }
 
         function generateConfig() {
+            const tenantId = state.data.company_name
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 30);
+
             const config = {
                 company_name: state.data.company_name,
-                tenant_id: state.data.tenant_id,
+                tenant_id: tenantId,
                 phone: state.data.phone,
                 contact_email: state.data.email,
                 locations: state.data.locations,
                 business_hours: state.data.business_hours,
                 services: state.data.services,
-                faq_data: state.data.faq_data || []
+                greeting_response: state.data.greeting || `Hej! Jag är ${state.data.company_name}s digitala kundtjänst. Hur kan jag hjälpa dig idag?`,
+                contact_response: `Du når oss på ${state.data.phone} eller ${state.data.email}.`,
+                hours_response: state.data.business_hours,
+                faq_data: state.data.faq_data || [],
+                fault_report_keywords: ["felanmälan", "problem", "fel", "trasig", "fungerar inte", "läcka"],
+                emergency_keywords": ["akut", "brinner", "brand", "gasläcka", "översvämning", "vattenläcka"],
+                escalation: {
+                    enable_lead_scoring: true,
+                    auto_escalate_threshold: 4,
+                    lead_threshold: 3
+                },
+                api_key: state.data.api_key
             };
 
             return JSON.stringify(config, null, 2);
@@ -571,18 +662,16 @@
             collectData(4);
 
             if (!state.data.api_key) {
-                alert('Vänligen ange din API Key');
+                alert('Vänligen ange din API-nyckel');
                 return;
             }
 
-            // Show loading
             goToStep('loading');
 
-            // Simulate setup process
             const statuses = [
-                'Genererar config-fil...',
-                'Validerar inställningar...',
-                'Förbereder deployment...'
+                'Genererar config...',
+                'Validerar uppgifter...',
+                'Förbereder fil...'
             ];
 
             let i = 0;
@@ -609,7 +698,8 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${state.data.tenant_id}.json`;
+            const tenantId = state.data.company_name.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 20);
+            a.download = `${tenantId}-config.json`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -617,31 +707,24 @@
         function copyConfig() {
             const config = generateConfig();
             navigator.clipboard.writeText(config).then(() => {
-                alert('Config kopierad!');
+                alert('Config kopierad! Skicka den till oss så sätter vi upp din bot.');
             });
         }
 
-        function showDeployInstructions() {
-            goToStep('deploy');
+        function emailConfig() {
+            const config = generateConfig();
+            const subject = encodeURIComponent(`Min bot-config: ${state.data.company_name}`);
+            const body = encodeURIComponent(`Hej!\n\nHär är min config för Support Starter AI.\n\n${config}\n\nVänligen,\n${state.data.company_name}`);
+            window.location.href = `mailto:din-email@foretaget.se?subject=${subject}&body=${body}`;
         }
 
-        // Auto-generate tenant_id from company name
-        document.getElementById('company_name')?.addEventListener('input', function() {
-            const tenantId = this.value.toLowerCase()
-                .replace(/[^a-z0-9\s]/g, '')
-                .replace(/\s+/g, '-')
-                .substring(0, 30);
-            if (!document.getElementById('tenant_id').value) {
-                document.getElementById('tenant_id').value = tenantId;
+        // Auto-format phone number
+        document.getElementById('phone')?.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 7) {
+                value = value.substring(0, 7) + '-' + value.substring(7);
             }
-        });
-
-        // Show config preview when api_key is entered
-        document.getElementById('api_key')?.addEventListener('input', function() {
-            if (this.value) {
-                document.getElementById('config-preview-container').style.display = 'block';
-                document.getElementById('config-preview').textContent = generateConfig();
-            }
+            this.value = value;
         });
     </script>
 </body>
