@@ -121,31 +121,38 @@ class FaultReportSystem:
         # Category detection patterns
         self.category_patterns = {
             FaultCategory.WATER: [
-                r"(vatten|avlopp|diskmaskin|tvättmaskin|kran|toalett|spola|läcker|droppar)",
+                r"(vatten|avlopp|diskmaskin|tvättmaskin|kran|toalett|wc|spola|läcker|droppar)",
+                r"(vattenläcka|vatten.*skada|översvämning|fukt|mögel|vattenskada)",
+                r"(badrum|kök|diskho|handfat|dusch|golvet|tak.*vatten)",
                 r"(water|drain|dishwasher|washing.*?machine|faucet|toilet|leak|drip)"
             ],
             FaultCategory.ELECTRICAL: [
                 r"(ström|ljus|lampa|uttag|brytare|säkring|elektrisk|glimra|strömavbrott)",
+                r"(ingen.*ström|ström.*borta|sälning|fas|utr.*slår|slå.*ej)",
                 r"(power|electric|light|lamp|outlet|switch|fuse|spark|blackout)"
             ],
             FaultCategory.HEATING: [
                 r"(element|ventilation|termostat|radiator|kyla.*?inomhus|fryser.*?inomhus|ingen.*värme)",
+                r"(värme.*ej|kallt.*i|element.*kall|radiator.*ej)",
                 r"(heating|radiator|thermostat|freezing.*?inside|no.*?heat)"
             ],
             FaultCategory.SECURITY: [
-                r"(utelåst|låst.*ute|nyckel|lås|inbrott|skadegörelse|larm)",
+                r"(utelåst|låst.*ute|nyckel|lås|inbrott|skadegörelse|larm|dörr|fönster)",
+                r"(kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel|låset.*går)",
                 r"(lock.*?out|locked.*?out|break.?in|burglary|vandalism|alarm)"
             ],
             FaultCategory.STRUCTURAL: [
-                r"(tak|vägg|golv|taklucka|spricka|skada|väggbeklädnad)",
+                r"(tak|vägg|golv|taklucka|spricka|skada|väggbeklädnad|hål|skador)",
+                r"(fönster|dörr|fönsterkarm|krossad|krossat|balkong)",
                 r"(roof|wall|floor|ceiling|crack|damage)"
             ],
             FaultCategory.APPLIANCE: [
-                r"(spis|ugn|kylskåp|frys|diskmaskin|tvättmaskin|torktumlare)",
+                r"(spis|ugn|kylskåp|frys|diskmaskin|tvättmaskin|torktumlare|vitvaror)",
                 r"(stove|oven|fridge|dishwasher|washing.*?machine|dryer)"
             ],
             FaultCategory.NOISE: [
                 r"(granne|grannar|stör|musik|buller|ljud|hög.*|horn|skrik|bråk|fest|partaj|duns|bank|smäll)",
+                r"(nattstörning|natten.*stör|högt|volym|bas|duns)",
                 r"(neighbor|noise|loud|music|party|shouting|fighting)"
             ]
         }
@@ -156,27 +163,45 @@ class FaultReportSystem:
 
         # CRITICAL - Life safety or property damage
         critical_patterns = [
-            r"\b(översvämning|(akut|stort|forsar|strömmar).*vattenläcka|vattenläcka.*(akut|stort|forsar|strömmar)|brustet.*rör|vatten.*(står|forsar))\b",
-            r"\b(brinner|brand|gasläcka|gas.*luktar|eld|rök|luktar.*gas)\b",
-            r"\b(låst.*ute|utelåst|kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel|låset.*går.*inte)\b",
-            r"\b(inbrott|skadegörelse|krossat|försöker.*ta.*sig)\b",
-            r"\b(akut|kritiskt|oj|hjälp|nödan|tvingas)\b!+"
+            # Water related - Swedish
+            r"\b(vattenläcka|vatten.*läcker|vatten.*strömmar|vatten.*sprutar|översvämning|vatten.*skador|stora.*vatten)\b",
+            r"\b(läcker.*vatten|vatten.*läcker|rör.*brust|rör.*sprutar|avlopp.*stopp.*vatten)\b",
+            r"\b(kök.*vattenläcka|badrum.*vattenläcka|golvet.*vatten|tak.*vatten|vatten.*igenom)\b",
+            # Fire/Gas - Swedish
+            r"\b(brinner|brand|gasläcka|gas.*luktar|eld|rök|luktar.*gas|eldsvåda)\b",
+            # Lockout - Swedish
+            r"\b(låst.*ute|utelåst|kommer.*inte.*in|tappat.*nyckel|nyckel.*borta|glömde.*nyckel|låset.*går.*inte|stängd.*ute)\b",
+            # Break-in - Swedish
+            r"\b(inbrott|skadegörelse|krossat|försöker.*ta.*sig|krossat.*fönster|völker.*in|stöld)\b",
+            # General emergency - Swedish
+            r"\b(akut!|akut.*!|kritiskt|oj!*|hjälp!*|nödan|tvingas|polis|ambulans|brandkår|rädda)\b"
         ]
 
         # HIGH - Important issues affecting comfort/safety
         high_patterns = [
-            r"\b(ingen.*varmvatten|inget.*vatten|vatten.*saknas|kranen.*ger.*inget)\b",
-            r"\b(ingen.*värme|elementen.*kalla|kyla.*inomhus|fryser.*inomhus|termostat.*inte|värme.*ej)\b",
-            r"\b(lås.*gått.*sönder|nyckel.*fast|dörr.*går.*inte.*öppna)\b",
-            r"\b(ingen.*ström|strömavbrott|elektricitet.*borta|själva.*fastigheten.*ström)\b"
+            # Water - Swedish
+            r"\b(ingen.*varmvatten|inget.*vatten|vattnet.*går|kranen.*ger.*inget|vatten.*borta)\b",
+            r"\b(avlopp.*stopp|avlopp.*backar|toilet.*stopp|wc.*stopp|spola.*ej.*går)\b",
+            # Heating - Swedish
+            r"\b(ingen.*värme|elementen.*kalla|kallt.*i.*lägenheten|kyla.*inomhus|fryser.*inomhus)\b",
+            r"\b(termostat.*inte|värme.*ej|element.*ej|radiator.*kall|inget.*värme)\b",
+            # Electricity - Swedish
+            r"\b(ingen.*ström|strömavbrott|ström.*borta|elektricitet.*borta|ljus.*släckt)\b",
+            r"\b(går.*ej.*slå|slå.*ej.*på|uttags.*ej|brytare.*ej|säkring.*gått|sälning|fas.*borta)\b",
+            # Lock issues
+            r"\b(lås.*gått.*sönder|nyckel.*fast|dörr.*går.*inte.*öppna|nyckel.*fastnat|vrider.*ej)\b"
         ]
 
         # MEDIUM - Annoying issues
         medium_patterns = [
-            r"\b(droppar|läcker|kran|droppande|läcker|lite.*vatten)\b",
-            r"\b(låter|buller|konstig.*ljud|problem|fungerar.*dåligt)\b",
+            # Water leaks (minor)
+            r"\b(droppar|läcker|kran|droppande|läcker.*lite|vatten.*droppar)\b",
+            r"\b(tappkran|handfat|diskho|badrumskran|droppar|kran.*läcker)\b",
+            # Noise
+            r"\b(låter|buller|konstig.*ljud|problem.*med|fungerar.*dåligt)\b",
             r"\b(granne|grannar|musik|stör|bråk|fest|partaj|skrik|ljud|hög.*|natt)\b",
-            r"\b(anmälan|felanmälan|anmäla|reparation|trasig|trasigt|fungerar.*ej|gått.*sönder)\b"
+            # General issues
+            r"\b(anmälan|felanmälan|anmäla|reparation|trasig|trasigt|fungerar.*ej|gått.*sönder|högrsa)\b"
         ]
 
         for pattern in critical_patterns:
@@ -352,10 +377,19 @@ class FaultReportSystem:
         questions = self.get_collection_questions(report)
         follow_up = "\n\n" + "\n".join(f"{i+1}. {q}" for i, q in enumerate(questions))
 
+        # CRITICAL: Send immediate escalation email for urgent reports even if not complete
+        should_escalate = self.should_escalate_immediately(urgency)
+        if should_escalate:
+            report.status = "escalated"
+            self._send_report_email(report)  # Send email immediately for urgent issues
+            print(f"🚨 IMMEDIATE ESCALATION for {report.report_id}: {urgency.value.upper()} - {category.value}")
+            # Add escalation notice to response
+            follow_up += "\n\n⚠️ Vi har skickat en akut notis till jourteamet!"
+
         return {
             "report": report,
             "response": response + follow_up,
-            "escalate_immediately": self.should_escalate_immediately(urgency),
+            "escalate_immediately": should_escalate,
             "collect_more_info": True,
             "is_new_report": True,
             "is_complete": False
