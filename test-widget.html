@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vallhamragruppen - Test Widget</title>
+    <title>Vallhamragruppen AB</title>
     <style>
         * {
             margin: 0;
@@ -12,106 +12,187 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #f5f5f5;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
             min-height: 100vh;
+            color: #333;
         }
 
+        /* Minimalist header matching vallhamragruppen.se */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
+            background: white;
+            color: #333;
+            padding: 60px 20px;
             text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* House logo */
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .logo svg {
+            width: 100%;
+            height: 100%;
+            fill: #333;
         }
 
         .header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
 
         .header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: #666;
+            letter-spacing: 1px;
         }
 
         .content {
             max-width: 800px;
-            margin: 40px auto;
+            margin: 60px auto;
             padding: 0 20px;
         }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: 1px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
         }
 
-        .card h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+        .section p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 12px;
+            font-weight: 300;
         }
 
-        .card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .info-box {
-            background: #e8f4f8;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            border-radius: 8px;
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
             margin-top: 20px;
         }
 
-        .info-box strong {
+        .contact-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .contact-item h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .contact-item p {
+            font-size: 1.1rem;
             color: #333;
         }
 
-        .status {
+        .demo-badge {
             display: inline-block;
-            padding: 5px 12px;
-            background: #10b981;
+            padding: 6px 14px;
+            background: #333;
             color: white;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             margin-left: 10px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 40px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+                letter-spacing: 1px;
+            }
+
+            .content {
+                margin: 40px auto;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 20px;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="header">
-        <h1>Vallhamragruppen <span class="status">Demo</span></h1>
-        <p>Fastighetsförvaltning i Johanneberg, Partille och Mölndal</p>
+        <div class="logo">
+            <svg viewBox="0 0 100 100">
+                <!-- House icon matching Vallhamragruppen style -->
+                <path d="M50 15 L10 45 L10 90 L35 90 L35 60 L65 60 L65 90 L90 90 L90 45 Z" fill="none" stroke="#333" stroke-width="3"/>
+                <rect x="42" y="65" width="16" height="16" fill="#333"/>
+            </svg>
+        </div>
+        <h1>VALLHAMRAGRUPPEN AB <span class="demo-badge">Demo</span></h1>
+        <p>Fastighetsförvaltning i Göteborg, Mölndal och Partille</p>
     </div>
 
     <div class="content">
-        <div class="card">
-            <h2>Välkommen!</h2>
-            <p>Vi erbjuder fastighetsförvaltning för både bostadsrättsföreningar och kommersiella fastigheter.</p>
+        <div class="section">
+            <h2>Välkommen</h2>
+            <p>Vallhamragruppen AB är ett familjeföretag som förvaltar såväl bostäder som lokaler.</p>
+            <p>Våra fastigheter finns i Göteborg, Mölndal och Partille.</p>
         </div>
 
-        <div class="card">
+        <div class="section">
             <h2>Kontakt</h2>
-            <p>
-                <strong>Telefon:</strong> 0793-006638<br>
-                <strong>E-post:</strong> info@vallhamragruppen.se<br>
-                <strong>Telefontider:</strong> Tis-Tors 9-12
-            </p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <h3>Telefon</h3>
+                    <p>0793-006638</p>
+                </div>
+                <div class="contact-item">
+                    <h3>E-post</h3>
+                    <p>info@vallhamragruppen.se</p>
+                </div>
+                <div class="contact-item">
+                    <h3>Telefontider</h3>
+                    <p>Tis-Tors 09-12</p>
+                </div>
+            </div>
         </div>
 
-        <div class="card">
+        <div class="section">
             <h2>Akuta ärenden</h2>
-            <p>Vid akuta ärenden (vattenläckor, strömavbrott, avloppsstopp) ring journummer dygnet runt.</p>
+            <p>Vid akuta ärenden (vattenläckor, strömavbrott, avloppsstopp med översvämning) - ring journummer direkt dygnet runt.</p>
+            <p>Vid fara för liv - ring 112.</p>
         </div>
 
-        <div class="info-box">
-            <strong>💬 Testa chattboten!</strong><br>
-            Klicka på chatt-ikonen nere i högra hörnet för att prata med vår AI-assistent.
+        <div class="section" style="text-align: center; padding: 30px; background: #f7f7f7; border-radius: 12px;">
+            <p style="font-size: 0.9rem; color: #666;">
+                Testa chattboten genom att klicka på chatt-ikonen i nedre högra hörnet.
+            </p>
         </div>
     </div>
 
