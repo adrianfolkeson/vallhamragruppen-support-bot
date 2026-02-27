@@ -335,6 +335,28 @@ Svara på svenska, var professionell och trevlig. Om du inte vet svaret, säg at
 
         message = sanitized_message
 
+        # 1.5. Check for GREETINGS (return immediately for fast response)
+        import re
+        greeting_patterns = [
+            r'^hej$', r'^hej!', r'^hej\s', r'^tja', r'^hallå', r'^tjena',
+            r'^god dag', r'^god morg', r'^god kväll', r'^hi', r'^hello',
+            r'^hey', r'^yo', r'^tack'
+        ]
+        message_lower = message.lower().strip()
+        for pattern in greeting_patterns:
+            if re.match(pattern, message_lower, re.IGNORECASE):
+                reply = self.config.greeting_response
+                self._log_bot_response(session_id, reply, "greeting", False)
+                return create_response(
+                    reply=reply,
+                    intent="greeting",
+                    confidence=1.0,
+                    sentiment="positive",
+                    lead_score=1,
+                    escalate=False,
+                    action="none"
+                )
+
         # 2. Get or create session
         session = self.memory.get_or_create_session(session_id)
         self.metrics.track_conversation_start(session_id)

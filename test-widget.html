@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vallhamragruppen - Test Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box strong {
+            color: #333;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Vallhamragruppen <span class="status">Demo</span></h1>
+        <p>Fastighetsförvaltning i Johanneberg, Partille och Mölndal</p>
+    </div>
+
+    <div class="content">
+        <div class="card">
+            <h2>Välkommen!</h2>
+            <p>Vi erbjuder fastighetsförvaltning för både bostadsrättsföreningar och kommersiella fastigheter.</p>
+        </div>
+
+        <div class="card">
+            <h2>Kontakt</h2>
+            <p>
+                <strong>Telefon:</strong> 0793-006638<br>
+                <strong>E-post:</strong> info@vallhamragruppen.se<br>
+                <strong>Telefontider:</strong> Tis-Tors 9-12
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Akuta ärenden</h2>
+            <p>Vid akuta ärenden (vattenläckor, strömavbrott, avloppsstopp) ring journummer dygnet runt.</p>
+        </div>
+
+        <div class="info-box">
+            <strong>💬 Testa chattboten!</strong><br>
+            Klicka på chatt-ikonen nere i högra hörnet för att prata med vår AI-assistent.
+        </div>
+    </div>
+
+    <!-- Chat Widget Configuration -->
+    <script>
+    window.CHAT_WIDGET_API_URL = "http://46.62.199.65:8000/chat";
+    window.CHAT_WIDGET_TENANT_ID = "default";
+    window.CHAT_WIDGET_COMPANY_NAME = "Vallhamragruppen";
+    window.CHAT_WIDGET_WELCOME_MESSAGE = "Hej! Jag är Vallhamragruppens digitala kundtjänst. Hur kan jag hjälpa dig idag?";
+    </script>
+
+    <!-- Chat Widget Script -->
+    <script src="http://46.62.199.65:8000/widget/chat-widget.js"></script>
+
+</body>
+</html>
